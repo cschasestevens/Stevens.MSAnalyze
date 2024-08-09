@@ -1,0 +1,26 @@
+{
+    "id": "D437A899",
+    "path": "~/Dev/Chase.MSAnalyze/R/hello.R",
+    "project_path": "R/hello.R",
+    "type": "r_source",
+    "hash": "3920630657",
+    "contents": "",
+    "dirty": false,
+    "created": 1723130412199.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "5,61",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1723130410,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1723130410,
+    "read_only": false,
+    "read_only_alternatives": []
+}
