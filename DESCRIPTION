@@ -1,11 +1,11 @@
-Package: Stevens.scRNASeq
-Date: 2024-07-08
+Package: Stevens.MSAnalyze
+Date: 2024-10-01
 Type: Package
-Title: Streamlined Processing and Analysis of Single-cell RNA-Sequencing Datasets
-Version: 1.2
+Title: Streamlined Processing and Analysis of Metabolomics Datasets
+Version: 1.1
 Author: Nathanial C. Stevens
 Maintainer: Nathanial C. Stevens <cschasestevens@gmail.com>
-Description: Utilizes Seurat in tandem with various R packages to perform processing and analysis of single-cell RNA-Sequencing (scRNA-Seq) datasets.    The methods included in this package provide a seamless workflow for commonly used Seurat functions, statistical methods, and visualization of scRNA-Seq data.    Most analyses can be run in parallel using intuitive functions to expedite time-consuming steps such as dataset integration and differential expression analysis.    The package is compatible with Windows, Linux, or WSL2. However, analyses conducted in Windows default to sequential processing due to inherent stability issues of parallel processing in Windows.
+Description: Utilizes various R packages to perform processing and analysis of metabolomics and lipidomics datasets.    The methods included in this package provide a seamless workflow for standard data processing, statistical methods, and visualization of metabolomics data.    Most analyses can be run in parallel to expedite time-consuming analyses.    The package is compatible with all operating systems. However, parallel processing is only available on Mac and Linux OS.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -19,26 +19,18 @@ Imports:
   dplyr,
   ggsci,
   ggrepel,
+  readxl,
+  openxlsx,
   gtools,
-  SoupX,
-  scDblFinder,
-  SingleCellExperiment,
-  SummarizedExperiment,
-  MAST,
   viridis,
   BiocGenerics,
   parallel,
   reshape2,
   ggpubr,
-  Seurat,
-  SeuratObject,
   future,
   circlize,
   ComplexHeatmap,
   magrittr,
   EnhancedVolcano,
   lazyeval,
-  biomaRt,
-  topGO,
-  org.Hs.eg.db,
   shadowtext

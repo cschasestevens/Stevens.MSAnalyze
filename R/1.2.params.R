@@ -6,6 +6,7 @@
 #' @param md.num Number of metadata columns in input data file.
 #' @param qc.rep Should a QC report be generated for the selected dataset? (TRUE/FALSE)
 #' @param norm1 Logical indicating if the data have been normalized.
+#' @param ref1 Reference annotation list for assigning compound details/class information (provided as a .txt file).
 #' @return List containing formatted input data and metadata for downstream analysis.
 #' @examples
 #'
@@ -17,7 +18,8 @@ ms.input <- function(
     f,
     md.num,
     qc.rep,
-    norm1
+    norm1,
+    ref1
     ) {
   if(tools::file_ext(f) == "xlsx"){
     d <- readxl::read_excel(paste("data/","example.xlsx",sep = ""),sheet = 1)
