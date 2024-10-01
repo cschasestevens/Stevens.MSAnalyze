@@ -1,51 +1,74 @@
 #' Install Libraries
 #'
-#' Installs CRAN and Bioconductor packages (if not already installed) necessary to run package
+#' Installs CRAN and Bioconductor dependencies
 #'
 #' @return Summary of installed packages
 #' @examples
 #'
-#'  # sc.check.lib()
+#'  # ms_check_lib()
 #'
 #' @export
-sc.check.lib <- function(){
-  list.pkg.CRAN <- c(
-    "ggplot2","dplyr","ggsci","ggrepel","gtools",
-    "viridis","parallel","reshape2","ggpubr","Seurat",
-    "SeuratObject","future","circlize","magrittr","lazyeval",
-    "shadowtext","SeuratData"
-    )
-  
-  list.pkg.BIOC <- c(
-    "SoupX","scDblFinder","SingleCellExperiment","SummarizedExperiment","MAST",
-    "BiocGenerics","parallel","ComplexHeatmap","biomaRt","topGO",
-    "org.Hs.eg.db","EnhancedVolcano"
-    )
-  
-  # mis.CRAN <- list.pkg.CRAN[!(list.pkg.CRAN %in%  as.character(installed.packages()[order(as.character(installed.packages()[,"Package"])),"Package"]))]
-  
-  if(length(list.pkg.CRAN) > 0){
+ms_check_lib <- function() {
+  list_pkg_CRAN <- c(
+    "ggplot2", "dplyr", "ggsci", "ggrepel", "gtools",
+    "viridis", "parallel", "reshape2", "ggpubr",
+    "future", "circlize", "magrittr", "lazyeval",
+    "shadowtext"
+  )
+
+  list_pkg_BIOC <- c(
+    "BiocGenerics", "parallel", "ComplexHeatmap",
+    "EnhancedVolcano"
+  )
+
+  if(length(list_pkg_CRAN) > 0) { # nolint
     print("Attempting to install/update the following packages...")
-    print(paste("CRAN:",paste(list.pkg.CRAN,collapse = ", "),sep = " "))
+    print(
+      paste(
+        "CRAN:",
+        paste(
+          list_pkg_CRAN,
+          collapse = ", "
+        ),
+        sep = " "
+      )
+    )
     lapply(
-      list.pkg.CRAN,
+      list_pkg_CRAN,
       function(x) {
         tryCatch(
-          {install.packages(x)},
-          error = function(e) {paste("Latest version of",x,"already installed... skipping to next package.",sep = " ")})})
-    }
-
-  if("BiocManager" %in% installed.packages()[,"Package"] == FALSE){
-    install.packages("BiocManager")
-    }
-  
-  if(length(list.pkg.BIOC) > 0){
-    print("Attempting to install/update the following packages...")
-    print(paste("Bioconductor:",paste(list.pkg.BIOC,collapse = ", "),sep = " "))
-    BiocManager::install(list.pkg.BIOC)
-    }
-
+          {
+            install.packages(x)
+          },
+          error = function(e) {
+            paste(
+              "Latest version of",
+              x,
+              "already installed... skipping to next package.",
+              sep = " "
+            )
+          }
+        )
+      }
+    )
   }
 
+  if("BiocManager" %in% installed.packages()[,"Package"] == FALSE) { # nolint
+    install.packages("BiocManager")
+  }
 
-
+  if(length(list_pkg_BIOC) > 0) { # nolint
+    print("Attempting to install/update the following packages...")
+    print(
+      paste(
+        "Bioconductor:",
+        paste(
+          list_pkg_BIOC,
+          collapse = ", "
+        ),
+        sep = " "
+      )
+    )
+    BiocManager::install(list_pkg_BIOC)
+  }
+}
