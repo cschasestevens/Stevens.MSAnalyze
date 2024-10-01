@@ -9,14 +9,14 @@
 #'
 #' @export
 ms_check_lib <- function() {
-  list_pkg_CRAN <- c(
+  list_pkg_CRAN <- c( # nolint
     "ggplot2", "dplyr", "ggsci", "ggrepel", "gtools",
     "viridis", "parallel", "reshape2", "ggpubr",
     "future", "circlize", "magrittr", "lazyeval",
     "shadowtext"
   )
 
-  list_pkg_BIOC <- c(
+  list_pkg_BIOC <- c( # nolint
     "BiocGenerics", "parallel", "ComplexHeatmap",
     "EnhancedVolcano"
   )
