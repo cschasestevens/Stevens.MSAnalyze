@@ -25,7 +25,7 @@ col_univ <- function() {
 #' @return Vector of colors to replace default gradient color scale.
 #' @examples
 #'
-#' col_grad()
+#' # col_grad()
 #'
 #' @export
 col_grad <- function() {
@@ -39,7 +39,7 @@ col_grad <- function() {
 #' @return ggplot2 theme parameters to replace default plot theme.
 #' @examples
 #'
-#' # sc_theme1()
+#' # ms_theme1()
 #'
 #' @export
 ms_theme1 <- function() {
@@ -60,22 +60,22 @@ ms_theme1 <- function() {
     axis.ticks.y = ggplot2::element_blank(),
     axis.text.x = ggplot2::element_text(
       face = "bold",
-      size = 14,
+      size = 10,
       angle = 45,
       hjust = 1,
       vjust = 1
     ),
     axis.text.y = ggplot2::element_text(
       face = "bold",
-      size = 14
+      size = 10
     ),
     axis.title.x = ggplot2::element_text(
       face = "bold",
-      size = 14
+      size = 12
     ),
     axis.title.y = ggplot2::element_text(
       face = "bold",
-      size = 14
+      size = 12
     ),
     # Strip
     strip.background = ggplot2::element_rect(

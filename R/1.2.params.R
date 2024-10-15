@@ -17,10 +17,11 @@
 #' @examples
 #'
 #' # ms_input(
-#' #   "example.xlsx",
+#' #   "example.txt",
 #' #   4,
 #' #   FALSE,
-#' #   TRUE
+#' #   TRUE,
+#' #   "reference.txt"
 #' # )
 #'
 #' @export
@@ -56,13 +57,24 @@ ms_input <- function(
         "an.comp"
       )
     )
+    if(missing(ref1) == TRUE) { # nolint
+      r1 <- read.table(
+        "ref/0.masterlist.txt",
+        header = TRUE,
+        sep = "\t"
+      )
+    }
+    if(missing(ref1) == FALSE) { # nolint
+      r1 <- ref1
+    }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
       "meta" = d[, 1:md_num],
       "anno" = a1,
       "istd" = d[, a1[a1[["type"]] == "iSTD", "ID"] + md_num],
       "qc" = qc_rep,
-      "nrm" = norm1
+      "nrm" = norm1,
+      "anno.ref" = r1
     )
   }
   if(tools::file_ext(f) == "csv") { # nolint
@@ -91,16 +103,24 @@ ms_input <- function(
         "an.comp"
       )
     )
+    if(missing(ref1) == TRUE) { # nolint
+      r1 <- read.table(
+        "ref/0.masterlist.txt",
+        header = TRUE,
+        sep = "\t"
+      )
+    }
+    if(missing(ref1) == FALSE) { # nolint
+      r1 <- ref1
+    }
     lpar <- list(
-      "data" = d[, -c(
-        1:md_num,
-        a1[a1[["type"]] == "iSTD", "ID"] + md_num
-      )],
+      "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
       "meta" = d[, 1:md_num],
       "anno" = a1,
       "istd" = d[, a1[a1[["type"]] == "iSTD", "ID"] + md_num],
       "qc" = qc_rep,
-      "nrm" = norm1
+      "nrm" = norm1,
+      "anno.ref" = r1
     )
   }
   if(tools::file_ext(f) == "txt") { # nolint
@@ -124,18 +144,30 @@ ms_input <- function(
       "type" = ifelse(
         grepl(
           "iSTD|1_CE.22.1|1_Sphingosine.d17.1",
-          names(d[, (md_num + 1):ncol(d)])),
+          names(d[, (md_num + 1):ncol(d)])
+        ),
         "iSTD",
         "an.comp"
       )
     )
+    if(missing(ref1) == TRUE) { # nolint
+      r1 <- read.table(
+        "ref/0.masterlist.txt",
+        header = TRUE,
+        sep = "\t"
+      )
+    }
+    if(missing(ref1) == FALSE) { # nolint
+      r1 <- ref1
+    }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
       "meta" = d[, 1:md_num],
       "anno" = a1,
       "istd" = d[, a1[a1[["type"]] == "iSTD", "ID"] + md_num],
       "qc" = qc_rep,
-      "nrm" = norm1
+      "nrm" = norm1,
+      "anno.ref" = r1
     )
   }
   return(lpar)

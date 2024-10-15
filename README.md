@@ -1,12 +1,10 @@
-# Stevens.scRNASeq v1.2
+# Stevens.MSAnalyze v1.0
 
-Streamlined Processing and Analysis of Single-cell RNA-Sequencing Datasets
+Processing and Analysis of Metabolomics Datasets
 
 ## Description
 
-Utilizes Seurat in tandem with various R packages to perform processing and analysis of single-cell RNA-Sequencing (scRNA-Seq) datasets. The methods included in this package provide a seamless workflow for commonly used Seurat functions, statistical methods, and visualization of scRNA-Seq data. Most analyses can be run in parallel using intuitive functions to expedite time-consuming steps such as dataset integration and differential expression analysis. The package is compatible with Windows, Linux, or WSL2. However, analyses conducted in Windows default to sequential processing due to inherent stability issues of parallel processing in Windows.
-
-* Important: Seurat objects created in Seurat v5 may not integrate counts data properly. A forthcoming update will address this issue while retaining backwards compatibility with Seurat v4 objects.
+Utilizes various R packages to perform processing and analysis of metabolomics and lipidomics datasets.    The methods included in this package provide a seamless workflow for standard data processing, statistical methods, and visualization of metabolomics data.    Most analyses can be run in parallel to expedite time-consuming analyses.    The package is compatible with all operating systems. However, parallel processing is only available on Mac and Linux OS.
 
 ## Getting Started
 
@@ -14,45 +12,41 @@ Utilizes Seurat in tandem with various R packages to perform processing and anal
 * Windows 10-11, WSL Ubuntu 22.04 or higher, Linux Ubuntu 22.04 or higher, or macOS 12.7.1 or higher
 * R version 4.3.1 or higher (https://cran.r-project.org/)
 * (Optional) RStudio version 2023.06.2 or higher (https://posit.co/download/rstudio-desktop/)
-* R-packages (downloaded from CRAN unless otherwise specified):
+* (Optional) Conda installation of Python 3.9 and umap-learn (Only used for implementing UMAP via Python)
+* R-packages (downloaded from CRAN or Bioconductor):
     * Suggests: 
         * knitr,
-        * rmarkdown
+        * rmarkdown,
+        * reticulate,
+        * BiocManager
     * Imports: 
-        * ggplot2,
         * dplyr,
+        * ggplot2,
         * ggsci,
-        * ggrepel,
-        * gtools,
-        * SoupX,
-        * scDblFinder,
-        * SingleCellExperiment,
-        * SummarizedExperiment,
-        * MAST,
         * viridis,
-        * BiocGenerics,
+        * readxl,
+        * ggpubr,
+        * igraph,
+        * ggraph,
+        * shadowtext,
         * parallel,
         * reshape2,
-        * ggpubr,
-        * Seurat,
-        * SeuratObject,
-        * future,
-        * circlize,
-        * ComplexHeatmap,
-        * magrittr,
+        * ggrepel,
+        * plotly,
+        * htmlwidgets,
+        * umap,
+        * mvnormtest,
+        * grid,
         * EnhancedVolcano,
-        * lazyeval,
-        * topGO,
-        * org.Hs.eg.db,
-        * biomaRt,
-        * shadowtext
+        * circlize,
+        * ComplexHeatmap
 
 ### Installation
 * Run the following in a new R session on the command line or within R-Studio:
 
 ```
 devtools::install_github(
-  "cschasestevens/Stevens.scRNASeq", 
+  "cschasestevens/Stevens.MSAnalyze", 
   ref = "master", 
   build_vignettes = T
   )
@@ -62,14 +56,14 @@ devtools::install_github(
 * Browse vignettes by running the following:
 
 ```
-browseVignettes("Stevens.scRNASeq")
+browseVignettes("Stevens.MSAnalyze")
 ```
 
 * Access function documentation by running the following:
 
 ```
 # Type function name after package name
-?Stevens.scRNASeq::sc.predict.clusters
+?Stevens.MSAnalyze::ms_input
 ```
 
 ## Authors
@@ -80,8 +74,9 @@ browseVignettes("Stevens.scRNASeq")
 * LinkedIn: https://www.linkedin.com/in/nathanial-chase-stevens-phd-08775180/
 
 ## Version History
-* 1.2
-    * Added functions for enrichment analysis (both Gene Ontology and custom gene sets)
+* 1.1 (In Progress)
+    * Added functions for regression and correlation analysis
+    * Additional plotting functions for violin plots
 * 1.0
     * Initial Release
 
@@ -91,6 +86,5 @@ This project is licensed under the GNU General Public License Version 3 - see th
 
 ## Acknowledgments
 
-* Seurat package: Hao, Y., Stuart, T., Kowalski, M.H. et al. Dictionary learning for integrative, multimodal and scalable single-cell analysis. Nat Biotechnol 42, 293–304 (2024). https://doi.org/10.1038/s41587-023-01767-y
 * ComplexHeatmap package: Gu Z, Eils R, Schlesner M (2016). “Complex heatmaps reveal patterns and correlations in multidimensional genomic data.” Bioinformatics. <doi:10.1093/bioinformatics/btw313>
 * Circlize package: Gu, Z. circlize implements and enhances circular visualization in R. Bioinformatics 2014.
