@@ -159,7 +159,7 @@ head(d[["fcc"]])
 ```
 
 ### 3.2 Group Class Means/Class Ratios **(Development)**
-```{r, echo = TRUEALSE, results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, results=F, message=F, warning=F, eval = FALSE}
 
 ```
 
@@ -205,7 +205,7 @@ ggplot2::ggsave(
 ```
 
 ### 4.2. Statistics: ANOVA 1-, 2-, or 3-Variable and Visualization
-```{r, echo = TRUEALSE, results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, results=F, message=F, warning=F, eval = FALSE}
 # Run Stats
 d[["stats"]] <- ms_stat_anova(
   matpv = d[["data"]][["data.pareto"]],
