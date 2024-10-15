@@ -46,7 +46,7 @@ knitr::opts_chunk$set(
 ```
 
 ### 1.1. Check Dependencies and Environment
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Check if library is installed
 if("Stevens.MSAnalyze" %in% unique(installed.packages()[,1]) == FALSE){ #nolint
   devtools::install_github("cschasestevens/Stevens.MSAnalyze",
@@ -63,7 +63,7 @@ browseVignettes("Stevens.MSAnalyze")
 ```
 
 ### 1.2. Define Parameters and Upload Data
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Load data
 d <- ms_input(
   # File name
@@ -88,12 +88,12 @@ d[["anno"]] <- cbind(
 
 ## 2. Data Check
 ### 2.1. Quality Control **(Devlopment)**
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 
 ```
 
 ### 2.2. Data Transformation, Scaling, Normalization, and Imputation 
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Check data
 d <- ms_data_check(d, "Organ")
 # Plot distribution
@@ -117,7 +117,7 @@ dev.off()
 ```
 
 ### 2.3. Annotation Summary
-```{r, echo=F,fig.align="center",results=F,message=F,warning=F,eval = FALSE}
+```{r, echo = TRUE,fig.align="center",results=F,message=F,warning=F,eval = FALSE}
 # Total and Group-wise Annotation Information (Displayed as Sunburst plot)
 d_an <- ms_plot_anno(
   d,
@@ -135,7 +135,7 @@ ggplot2::ggsave(
 
 ## 3. Descriptive Statistics
 ### 3.1. Fold Change Calculation
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Fold Change - Individual
 d[["fc"]] <- ms_stat_fc(
   mat1 = d[["data"]][["imputed"]],
@@ -159,13 +159,13 @@ head(d[["fcc"]])
 ```
 
 ### 3.2 Group Class Means/Class Ratios **(Development)**
-```{r, echo=FALSE, results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUEALSE, results=F, message=F, warning=F, eval = FALSE}
 
 ```
 
 ## 4. Statistics and Hypothesis Testing
 ### 4.1. Dimension Reduction: PCA/UMAP/PLSDA
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 library(dplyr)
 set.seed(1234)
 # PCA
@@ -205,7 +205,7 @@ ggplot2::ggsave(
 ```
 
 ### 4.2. Statistics: ANOVA 1-, 2-, or 3-Variable and Visualization
-```{r, echo=FALSE, results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUEALSE, results=F, message=F, warning=F, eval = FALSE}
 # Run Stats
 d[["stats"]] <- ms_stat_anova(
   matpv = d[["data"]][["data.pareto"]],
@@ -335,7 +335,7 @@ dev.off()
 ```
 
 ### 4.3. ChemRICH and Visualization
-```{r, echo=F, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
+```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Run ChemRICH
 d[["chemrich"]] <- ms_stat_crich(
   d_stat = d[["stats"]],
