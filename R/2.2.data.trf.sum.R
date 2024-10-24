@@ -4,6 +4,8 @@
 #' quality checks on an untargeted dataset.
 #'
 #' @param ld Data list generated from ms_input().
+#' @param cl_var Variable for annotating sample correlation heatmap.
+#' @param samp_id Variable containing sample IDs.
 #' @return List containing formatted input data and metadata
 #' for downstream analysis.
 #' @examples
@@ -11,7 +13,7 @@
 #' # ms_data_check(d)
 #'
 #' @export
-ms_data_check <- function(ld) {
+ms_data_check <- function(ld, cl_var, samp_id) {
   # input data from ms_input()
   ld1 <- ld
   # data imputation
@@ -91,6 +93,63 @@ ms_data_check <- function(ld) {
       )
     return(p)
   }
+
+  ## Sample correlation heatmap
+  # Input
+  h1 <- ld1[["data.pareto"]]
+  h1md <- data.frame(
+    "Group" = as.factor(ld1[["meta"]][[cl_var]]),
+    "ID" = ld1[["meta"]][[samp_id]]
+  )
+  h2 <- t(
+    magrittr::set_rownames(
+      as.matrix(h1),
+      h1md[["ID"]]
+    )
+  )
+  ld1[["data.samp.corr"]] <- round(
+    cor(
+      h2,
+      method = "spearman"
+    ),
+    digits = 2
+  )
+  # Heatmap colors
+  fun_hm_col <- circlize::colorRamp2(
+    c(-1, 0, 0.5, 1),
+    colors = col_grad()[c(1, 3, 6, 12)]
+  )
+  set.seed(1234)
+  fun_hm_bar <- list(
+    cl_var = setNames(
+      col_univ()[1:length(levels(h1md[["Group"]]))], # nolint
+      as.character(levels(h1md[["Group"]]))
+    )
+  )
+  # Annotations
+  hm_anno_list <- list(
+    hm_col <- ComplexHeatmap::HeatmapAnnotation( # nolint
+      `Group` = h1md[["Group"]],
+      col = fun_hm_bar,
+      show_annotation_name = FALSE,
+      show_legend = TRUE
+    )
+  )
+  # Plot
+  h_out <- ComplexHeatmap::Heatmap(
+    ld1[["data.samp.corr"]],
+    col = fun_hm_col,
+    name = "Correlation",
+    top_annotation = hm_anno_list[[1]],
+    show_column_names = TRUE,
+    show_row_names = TRUE,
+    cluster_columns = TRUE,
+    cluster_rows = TRUE,
+    heatmap_width = ggplot2::unit(16, "cm"),
+    heatmap_height = ggplot2::unit(16, "cm"),
+    column_title = "Sample Correlation"
+  )
+
   lp1 <- list(
     "plot.dist" = ggpubr::ggarrange(
       dst(ld1[["data"]], "Input"),
@@ -98,7 +157,8 @@ ms_data_check <- function(ld) {
       dst(ld1[["data.pareto"]], "Pareto Scaled"),
       nrow = 1,
       ncol = 3
-    )
+    ),
+    "plot.cor" = h_out
   )
 
   return(

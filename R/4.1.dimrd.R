@@ -25,6 +25,7 @@
 #' #   md = d[["data"]][["meta"]],
 #' #   md_var = c("Organ"),
 #' #   dim_type = "PCA",
+#' #   ret_umap = TRUE,
 #' #   dim1 = "3D",
 #' #   p_type = "single",
 #' #   p_lab = FALSE

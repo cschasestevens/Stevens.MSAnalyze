@@ -106,3 +106,36 @@ ms_theme1 <- function() {
     thm_leg_main
   return(thm_mult)
 }
+
+#' Network Plot Theme
+#'
+#' General network plot theme.
+#'
+#' @return ggplot2 theme parameters to replace default plot theme.
+#' @examples
+#'
+#' # ms_theme_net()
+#'
+#' @export
+ms_theme_net <- function() {
+  thm_gen <- ggplot2::theme(
+    # Remove axis lines and text
+    panel.grid.major.y = ggplot2::element_blank(),
+    panel.grid.minor = ggplot2::element_blank(),
+    axis.text.x = ggplot2::element_blank(),
+    axis.text.y = ggplot2::element_blank(),
+    axis.title.x = ggplot2::element_blank(),
+    axis.title.y = ggplot2::element_blank(),
+    # Edit legend
+    legend.position = c(0.9, 0.92),
+    legend.text = ggplot2::element_text(
+      size = 14
+    ),
+    legend.key.size = ggplot2::unit(
+      0.2,
+      "cm"
+    ),
+    legend.key = ggplot2::element_blank()
+  )
+  return(thm_gen)
+}

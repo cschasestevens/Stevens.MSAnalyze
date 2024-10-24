@@ -29,10 +29,11 @@ ms_stat_crich <- function(
   # load data
   d1 <- d_stat
   d2 <- d_ref
+  cl1 <- cl_name
   # Assign classes from reference
   d3 <- dplyr::left_join(
     d1,
-    d2[, c("Name", cl_name)],
+    d2[, c("Name", cl1, "label")],
     by = "Name"
   )
   # Run KS test for each comparison and create separate results df
@@ -43,7 +44,7 @@ ms_stat_crich <- function(
       seq.int(1, length(cmp1), 1),
       function(x) {
         # Extract unique Classes
-        cr1 <- unique(d3[[cl_name]])
+        cr1 <- unique(d3[[cl1]])
         ## Remove from list if unknown
         cr1 <- cr1[cr1 != "Unknown"]
         # Run KS test for each class
@@ -55,19 +56,19 @@ ms_stat_crich <- function(
               ksdf <- ks.test(
                 d3[
                   d3[["Comparison.fc"]] == cmp1[[x]] &
-                    d3[[cl_name]] == cr1[[y]], c("p adj")
+                    d3[[cl1]] == cr1[[y]], c("p adj")
                 ],
                 "punif",
                 alternative = "greater"
               )
               # Replace NaN and format output
-              ksdf2 <- data.frame(
+              ksdf2 <- setNames(data.frame(
                 "Comparison.ID" = x,
                 "Comparison" = cmp1[[x]],
                 "Cluster.ID" = y,
                 "Cluster" = cr1[[y]],
                 "p.value" = ksdf[["p.value"]]
-              )
+              ), c("Comparison.ID", "Comparison", "Cluster.ID", cl1, "p.value"))
               ksdf2[is.nan(ksdf2[["p.value"]]), c("p.value")] <- 1
               return(ksdf2)
             }
@@ -86,15 +87,15 @@ ms_stat_crich <- function(
           setNames(
             dplyr::count(
               as.data.frame(
-                d3[d3[["Comparison.fc"]] == cmp1[[x]], c(cl_name)]
+                d3[d3[["Comparison.fc"]] == cmp1[[x]], c(cl1)]
               ),
               as.data.frame(
-                d3[d3[["Comparison.fc"]] == cmp1[[x]], c(cl_name)]
+                d3[d3[["Comparison.fc"]] == cmp1[[x]], c(cl1)]
               )[[1]]
             ),
-            c("Cluster", "n")
+            c(cl1, "n")
           ),
-          by = "Cluster"
+          by = cl1
         )
         # Inc:Dec Ratio
         cr_rat <- data.frame(
@@ -103,10 +104,10 @@ ms_stat_crich <- function(
               dplyr::filter(
                 setNames(
                   data.frame(
-                    "Cluster" = as.data.frame(
+                    cl1 = as.data.frame(
                       d3[
                         d3[["Comparison.fc"]] == cmp1[[x]],
-                        c(cl_name)
+                        c(cl1)
                       ]
                     ),
                     "Ratio" = ifelse(
@@ -120,14 +121,14 @@ ms_stat_crich <- function(
                       "Dec"
                     )
                   ),
-                  c("Cluster", "Ratio")
+                  c(cl1, "Ratio")
                 ),
                 .data[["Ratio"]] == "Inc" # nolint
               ),
-              .data[["Cluster"]]
+              .data[[cl1]]
             ),
             c(
-              "Cluster",
+              cl1,
               "Increased"
             )
           )
@@ -140,10 +141,10 @@ ms_stat_crich <- function(
                 dplyr::filter(
                   setNames(
                     data.frame(
-                      "Cluster" = as.data.frame(
+                      cl1 = as.data.frame(
                         d3[
                           d3[["Comparison.fc"]] == cmp1[[x]],
-                          c(cl_name)
+                          c(cl1)
                         ]
                       ),
                       "Ratio" = ifelse(
@@ -157,25 +158,25 @@ ms_stat_crich <- function(
                         "Dec"
                       )
                     ),
-                    c("Cluster", "Ratio")
+                    c(cl1, "Ratio")
                   ),
                   .data[["Ratio"]] == "Dec" # nolint
                 ),
-                .data[["Cluster"]]
+                .data[[cl1]]
               ),
               c(
-                "Cluster",
+                cl1,
                 "Decreased"
               )
             )
           ),
-          by = "Cluster"
+          by = cl1
         )
         # Combine and finish formatting
         cr3 <- dplyr::left_join(
           cr2,
           cr_rat,
-          by = "Cluster"
+          by = cl1
         )
         cr3[is.na(cr3)] <- 0
         cr3[["Ratio"]] <- ifelse(
@@ -190,21 +191,21 @@ ms_stat_crich <- function(
         cr3[["sort"]] <- gsub(
           "^.*\\.",
           "",
-          cr3[["Cluster"]]
+          cr3[[cl1]]
         )
         cr3 <- cr3[order(cr3[["sort"]]), ]
         cr3 <- cr3[, -ncol(cr3)]
-        cr3[["Cluster"]] <- ifelse(
-          grepl("Unsaturated", cr3[["Cluster"]]),
-          gsub("Unsaturated", "Unsat", cr3[["Cluster"]]),
-          gsub("Saturated", "Sat", cr3[["Cluster"]])
-        )
-        if(class(cr3[["Cluster"]]) != "factor") { # nolint
-          cr3[["Cluster"]] <- factor(
-            cr3[["Cluster"]],
-            levels = c(cr3[["Cluster"]])
+        if(class(cr3[[cl1]]) != "factor") { # nolint
+          cr3[[cl1]] <- factor(
+            cr3[[cl1]],
+            levels = c(cr3[[cl1]])
           )
         }
+        cr3 <- dplyr::left_join(
+          cr3,
+          unique(d3[, c(cl1, "label")]),
+          by = cl1
+        )
         return(cr3)
       }
     ),
@@ -237,7 +238,7 @@ ms_plot_crich <- function(
   cr_plot <- ggplot2::ggplot(
     df,
     ggplot2::aes(
-      x = Cluster, # nolint
+      x = df[[4]], # nolint
       y = -log10(FDR), # nolint
       fill = Ratio # nolint
     )
@@ -246,7 +247,7 @@ ms_plot_crich <- function(
     ggplot2::geom_linerange(
       data = df[df[["FDR"]] < 0.05, ],
       ggplot2::aes(
-        x = df[df[["FDR"]] < 0.05, "Cluster"],
+        x = df[df[["FDR"]] < 0.05, 4],
         ymax = -log10(df[df[["FDR"]] < 0.05, "FDR"]),
         ymin = 0
       ),

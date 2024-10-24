@@ -102,7 +102,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 3, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -141,7 +141,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 1, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -301,7 +301,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 3, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -340,7 +340,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 1, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -492,7 +492,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 3, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -530,7 +530,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 1, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -688,7 +688,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 3, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
@@ -726,7 +726,7 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
               function(y) {
                 d2 <- dplyr::bind_rows(
                   lapply(
-                    seq.int(1, 7, 1),
+                    seq.int(1, 1, 1),
                     function(x) {
                       as.data.frame(
                         as.matrix(
