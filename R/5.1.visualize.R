@@ -276,16 +276,6 @@ ms_plot_heat <- function(
 #' Only required when network type is "annotation" or "enrichment".
 #' @param net_type Output network type. Currently supported types are
 #' "base", "annotation", or "enrichment".
-#'
-#' @param c_list Comparison list, provided as a vector.
-#' @param diff_col Column name containing effect size.
-#' @param p_col Column name containing adjusted p-values.
-#' @param an1 Variable names used for annotating the heatmap.
-#' @param hm_w Heatmap width.
-#' @param hm_h Heatmap height.
-#' @param fs_r Row fontsize.
-#' @param cl_c Logical indicating if the columns should be clustered.
-#' @param cl_r Logical indicating if the rows should be clustered.
 #' @return A network plot of the specified type.
 #' @examples
 #'

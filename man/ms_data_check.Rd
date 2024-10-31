@@ -4,10 +4,14 @@
 \alias{ms_data_check}
 \title{Data Transformation and Quality Check}
 \usage{
-ms_data_check(ld)
+ms_data_check(ld, cl_var, samp_id)
 }
 \arguments{
 \item{ld}{Data list generated from ms_input().}
+
+\item{cl_var}{Variable for annotating sample correlation heatmap.}
+
+\item{samp_id}{Variable containing sample IDs.}
 }
 \value{
 List containing formatted input data and metadata
