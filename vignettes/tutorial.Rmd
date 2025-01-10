@@ -83,9 +83,9 @@ d <- ms_input(
 
 # Add annotation information from reference
 d[["anno"]] <- d[["anno"]][d[["anno"]][["type"]] == "an.comp", ]
-d[["anno.ref"]] <- d[["anno.ref"]][
-  d[["anno.ref"]][["Source"]] == "sourcename",
-]
+
+nrow(d[["anno"]])
+nrow(d[["anno.ref"]])
 d[["anno"]] <- cbind(
   d[["anno"]],
   d[["anno.ref"]]

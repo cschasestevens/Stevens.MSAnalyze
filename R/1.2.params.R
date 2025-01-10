@@ -25,7 +25,7 @@
 #' # )
 #'
 #' @export
-ms_input <- function(
+ms_input <- function( # nolint
   f = NULL,
   md_num,
   qc_rep,
@@ -66,7 +66,7 @@ ms_input <- function(
       "anno.ref" = r1
     )
   }
-  if(tools::file_ext(f) == "xlsx") { # nolint
+  if(is.null(f) == FALSE && tools::file_ext(f) == "xlsx") { # nolint
     d <- readxl::read_excel(
       paste(
         "data/",
@@ -111,7 +111,7 @@ ms_input <- function(
       "anno.ref" = r1
     )
   }
-  if(tools::file_ext(f) == "csv") { # nolint
+  if(is.null(f) == FALSE && tools::file_ext(f) == "csv") { # nolint
     d <- read.csv(
       paste(
         "data/",
@@ -157,7 +157,7 @@ ms_input <- function(
       "anno.ref" = r1
     )
   }
-  if(tools::file_ext(f) == "txt") { # nolint
+  if(is.null(f) == FALSE && tools::file_ext(f) == "txt") { # nolint
     d <- read.table(
       paste(
         "data/",
