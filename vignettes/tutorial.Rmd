@@ -83,9 +83,6 @@ d <- ms_input(
 
 # Add annotation information from reference
 d[["anno"]] <- d[["anno"]][d[["anno"]][["type"]] == "an.comp", ]
-
-nrow(d[["anno"]])
-nrow(d[["anno.ref"]])
 d[["anno"]] <- cbind(
   d[["anno"]],
   d[["anno.ref"]]
@@ -101,7 +98,11 @@ d[["anno"]] <- cbind(
 ### 2.2. Data Transformation, Scaling, Normalization, and Imputation 
 ```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Check data
-d <- ms_data_check(d, "Organ")
+d <- ms_data_check(
+  ld = d,
+  cl_var = "Group",
+  samp_id = "label"
+)
 # Plot distribution
 ggplot2::ggsave(
   "analysis/plot.dist.png",
@@ -125,6 +126,7 @@ dev.off()
 ### 2.3. Annotation Summary
 ```{r, echo = TRUE,fig.align="center",results=F,message=F,warning=F,eval = FALSE}
 # Total and Group-wise Annotation Information (Displayed as Sunburst plot)
+names(d[["data"]][["anno"]])
 d_an <- ms_plot_anno(
   d,
   c("Major.Class", "Class", "Subclass")

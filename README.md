@@ -1,4 +1,4 @@
-# Stevens.MSAnalyze v1.0
+# Stevens.MSAnalyze v1.1
 
 Processing and Analysis of Metabolomics Datasets
 
