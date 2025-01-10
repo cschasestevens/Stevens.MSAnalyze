@@ -38,6 +38,254 @@ ms_data_check <- function(ld, cl_var, samp_id) {
     ),
     c(names(ld1[["imputed"]]))
   )
+  # Data normalization
+  head(d[["data"]][1:10])
+  head(d_prev)
+?scale
+## reverse median-centering log2 normalization
+### test for first sample
+# median centering log2 for raw data
+t(d_prev[1, 6:ncol(d_prev)])
+median(t(d_prev[1, 6:ncol(d_prev)]))
+sort(t(d_prev[1, 6:ncol(d_prev)]))
+sort(log2(t(d_prev[1, 6:ncol(d_prev)]) / median(t(d_prev[1, 6:ncol(d_prev)]))))
+
+sort(log2(2 ^ t(d[["data"]][1, ])))
+median(2 ^ t(d[["data"]][1, ]))
+### mTIC normalization
+d1.tic <- dplyr::select(
+  dplyr::left_join(
+    d1.tic,
+    setNames(
+      aggregate(
+        d1.tic[["mTIC"]],
+        list(
+          d1.tic[["Group"]]
+        ),
+        function(x) 
+          sum(x)
+      ),
+      c(
+        "Group","mTIC.sum"
+      )
+    ),
+    by = "Group"
+  ),
+  c(
+    "mTIC.sum",
+    everything()
+  )
+)
+
+# Group TCC
+d1.tic[,6:ncol(d1.tic)] <- as.data.frame(
+  lapply(
+    d1.tic[,6:ncol(
+      d1.tic
+    )],
+    function(x) 
+      (x/d1.tic[["TCC.million"]])*
+      median(
+        d1.tic[["TCC.million"]]
+      )
+  )
+)
+
+# Group mTIC
+d1.tic[,7:ncol(d1.tic)] <- as.data.frame(
+  lapply(
+    d1.tic[,7:ncol(
+      d1.tic
+      )],
+    function(x) 
+      (x/d1.tic[["mTIC.sum"]])*
+      median(
+        d1.tic[["mTIC.sum"]]
+        )
+    )
+  )
+
+d1.tic <- data.frame(
+  "mTIC.norm" = apply(
+    d1.tic[,6:ncol(
+      d1.tic
+    )],
+    1,
+    function(x) 
+      sum(x)
+  ),
+  d1.tic
+)
+
+p.tic2 <- ggplot(d1.tic, 
+                 aes(x = .data[["Index"]], 
+                     y = .data[["TCC.million"]])) +
+  geom_line(alpha = 0.5) +
+  geom_point(aes(color = as.factor(.data[["Group"]])),
+             shape=16,
+             size = 1,
+             alpha = 0.5) +
+  geom_smooth(color = "firebrick1",alpha = 0.5) +
+  labs(y = "TCC (million cells)", 
+       x = "Sample Index") +
+  thm.mult +
+  scale_color_manual(values = col1)
+
+
+ggsave(
+  "analysis/plot.compare.cell.counts.png",
+  ggarrange(p.tic1,p.tic2,ncol = 2,common.legend = T),
+  width = 14,
+  height = 6,
+  dpi = 600
+)
+
+
+### RSD before and after norm
+## calculate group RSDs for each compound
+sd(d1.tic[d1.tic$Group == "0.5.No BE","CE.16.1."])/
+mean(d1.tic[d1.tic$Group == "0.5.No BE","CE.16.1."])
+
+
+
+q.rsd <- lapply(
+  d1.tic[,8:ncol(d1.tic)],
+  function(x) 
+    aggregate(
+      x,
+      list(d1.tic[["Group"]]),
+      function(y) 
+        (sd(y)/
+           mean(y)*
+           100
+        )
+    )
+)
+
+q.rsd <- q.rsd %>%
+  purrr::reduce(
+    dplyr::left_join,
+    by = "Group.1"
+  )
+
+names(q.rsd) <- c("Group.RSD",names(d1.tic[,8:ncol(d1.tic)]))
+
+p.rsd <- reshape2::melt(
+  q.rsd,
+  id.vars = "Group.RSD"
+)
+
+p.rsd[["value"]] <- round(
+  as.numeric(
+    p.rsd[["value"]]
+  ),
+  digits = 2
+)
+
+p.rsd <- p.rsd[order(p.rsd[["Group.RSD"]]),]
+p.rsd[["ID"]] <- seq.int(1,nrow(p.rsd),1)
+aggregate(
+  p.rsd[["value"]],
+  list(
+    p.rsd[["Group.RSD"]]
+  ),
+  function(x) 
+    median(x)
+)
+
+
+p.rsd3 <- ggplot(
+  p.rsd, 
+  aes(
+    x = ID, 
+    y = value
+  )
+) +
+  geom_point(
+    aes(
+      color = .data[["Group.RSD"]]),
+    shape=16, 
+    size = 1,
+    alpha = 0.5
+  ) +
+  # geom_text_repel(data = subset(p.rsd, 
+  #                               value > 50),
+  #                 aes(label = p.rsd[p.rsd$value > 50,"Name"]),
+  #                 size = 3,
+  #                 segment.size = 0.1,
+  #                 segment.color = "grey",
+  #                 show.legend = F,
+  #                 bg.color = "black",
+  #                 color = "white") +
+  geom_hline(
+    yintercept = max(aggregate(
+      p.rsd[["value"]],
+      list(
+        p.rsd[["Group.RSD"]]
+      ),
+      function(x) 
+        median(x)
+    )[["x"]]),
+    linetype = "dashed",
+    color = "firebrick1") +
+  labs(
+    y = "Group % RSD", 
+    x = "Index"
+  ) +
+  thm.mult +
+  scale_color_manual(values = col1)
+
+
+ggsave(
+  "analysis/plot.qrsd.mtic.png",
+  ggarrange(p.rsd2,p.rsd3,ncol = 2,common.legend = T),
+  width = 14,
+  height = 6,
+  dpi = 400
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # Log2-transformation
   ld1[["data.log2"]] <- setNames(
     as.data.frame(

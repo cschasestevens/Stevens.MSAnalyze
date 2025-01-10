@@ -276,12 +276,22 @@ ms_plot_heat <- function(
 #' Only required when network type is "annotation" or "enrichment".
 #' @param net_type Output network type. Currently supported types are
 #' "base", "annotation", or "enrichment".
+#' @param cl_var Clustering variable to use for aggregating lipid classes.
+#' @param comp1 Comparison name for plotting enrichment statistics. Currently
+#' supports up to one comparison name.
+#' @param comp_sat Should unsaturated and saturated lipid classes be compared?
+#' Enter a logical value (TRUE/FALSE) to toggle lipid saturation comparisons.
+#' This parameter is dependent upon the presence of both unsaturated and
+#' saturated lipid classes in the enrichment statistics data frame.
 #' @return A network plot of the specified type.
 #' @examples
 #'
 #' # ms_plot_lipidnet(
 #' #   d_enrch = d[["chemrich"]],
 #' #   net_type = "enrichment",
+#' #   cl_var = "label.saturation",
+#' #   comp1 = "SAE:Normoxia-SAE:Hypoxia",
+#' #   comp_sat = TRUE,
 #' #
 #' #   c_list = c("KO vs. Control"),
 #' #   diff_col = "Log2FC",
@@ -295,9 +305,12 @@ ms_plot_heat <- function(
 #' # )
 #'
 #' @export
-ms_plot_lipidnet <- function(
+ms_plot_lipidnet <- function( # nolint
   d_enrch,
-  net_type
+  net_type,
+  cl_var,
+  comp1,
+  comp_sat
 ) {
   # Base network
   ## master list
@@ -373,8 +386,8 @@ ms_plot_lipidnet <- function(
     net1 <- d_enrch
     # Map dataset annotations
     net_anno <- setNames(aggregate(
-      unique(net1[, c("Cluster", "n", "label")])[["n"]], # nolint
-      list(unique(net1[, c("Cluster", "n", "label")])[["label"]]),
+      unique(net1[, c(cl_var, "n", "label")])[["n"]], # nolint
+      list(unique(net1[, c(cl_var, "n", "label")])[["label"]]),
       function(x) sum(x)
     ), c("label", "cluster.size"))
     ## Adjust node attributes
@@ -482,8 +495,8 @@ ms_plot_lipidnet <- function(
     net1 <- d_enrch
     # Map dataset annotations
     net_anno <- setNames(aggregate(
-      unique(net1[, c("Cluster", "n", "label")])[["n"]], # nolint
-      list(unique(net1[, c("Cluster", "n", "label")])[["label"]]),
+      unique(net1[, c(cl_var, "n", "label")])[["n"]], # nolint
+      list(unique(net1[, c(cl_var, "n", "label")])[["label"]]),
       function(x) sum(x)
     ), c("label", "cluster.size"))
     ## Adjust node attributes
@@ -514,356 +527,366 @@ ms_plot_lipidnet <- function(
     )
     # Map enrichment statistics
     ## Join enrichment results with network plot
-    net_enrch <- tidyr::pivot_wider(
-      net1[, c( # nolint
-        "Comparison", "label", "Saturation",
-        "Ratio", "FDR", "n"
-      )],
-      names_from = c(.data[["Comparison"]], .data[["Saturation"]]), # nolint
-      values_from = c(.data[["Ratio"]], .data[["FDR"]], .data[["n"]])
-    )
-    net_name1 <- names(net_enrch[, 2:ncol(net_enrch)]) # nolint
-    net_nodes <- dplyr::left_join(
-      net_nodes,
-      net_enrch,
-      by = "label"
-    )
+    if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
+      net_enrch <- tidyr::pivot_wider(
+        net1[, c( # nolint
+          "Comparison", "label", "Saturation",
+          "Ratio", "FDR", "n"
+        )],
+        names_from = c(.data[["Comparison"]], .data[["Saturation"]]), # nolint
+        values_from = c(.data[["Ratio"]], .data[["FDR"]], .data[["n"]])
+      )
+      net_name1 <- names(net_enrch[, 2:ncol(net_enrch)]) # nolint
+      net_nodes <- dplyr::left_join(
+        net_nodes,
+        net_enrch,
+        by = "label"
+      )
 
-    ## Network
-    net_plot <- igraph::graph_from_data_frame(
-      net_edges,
-      vertices = net_nodes
-    )
-    ## Network layout
-    net_plot_lay <- ggraph::create_layout(net_plot, layout = "stress")
-    net_plot_lay[["x"]] <- net_plot_lay[["x.man"]]
-    net_plot_lay[["y"]] <- net_plot_lay[["y.man"]]
+      ## Network
+      net_plot <- igraph::graph_from_data_frame(
+        net_edges,
+        vertices = net_nodes
+      )
+      ## Network layout
+      net_plot_lay <- ggraph::create_layout(net_plot, layout = "stress")
+      net_plot_lay[["x"]] <- net_plot_lay[["x.man"]]
+      net_plot_lay[["y"]] <- net_plot_lay[["y.man"]]
 
-    # Plot
-    net_plot2 <- ggraph::ggraph(
-      net_plot_lay
-    ) +
-      # color scheme
-      ggplot2::scale_color_manual(
-        "Pathway",
-        values = col_univ()
+      # Plot
+      net_plot2 <- ggraph::ggraph(
+        net_plot_lay
       ) +
-      # edge attributes
-      ggraph::geom_edge_link(
-        ggplot2::aes(
-          label = ifelse(
-            .data[["set.alpha.edge"]] == 0.25, # nolint
-            "",
-            .data[["enzyme.id"]]
-          ),
-          alpha = .data[["set.alpha.edge"]]
-        ),
-        label_dodge = ggplot2::unit(2, "mm"),
-        label_alpha = 0.5,
-        angle_calc = "along",
-        color = "grey50",
-        show.legend = FALSE
-      ) +
-      # Background for node panels
-      ggplot2::geom_rect(
-        ggplot2::aes(
-          xmin = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            x - 0.25 # nolint
-          ),
-          ymin = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            y - 0.25 # nolint
-          ),
-          ymax = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            y + 0.15
-          ),
-          xmax = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            x + 0.25
-          )
-        ),
-        alpha = 0.9,
-        fill = "grey",
-        color = "grey25",
-        show.legend = FALSE
-      ) +
-      # node points
-      ggraph::geom_node_point(
-        ggplot2::aes(
-          alpha = ifelse(
-            .data[["set.alpha"]] == 0, # nolint
-            1,
-            0
-          )
-        ),
-        color = "grey75",
-        show.legend = FALSE
-      ) +
-      ## Change scale
-      ggnewscale::new_scale_color() +
-      ## Enrichment nodes
-      # ChemRICH nodes
-      ggraph::geom_node_point(
-        ggplot2::aes(
-          size = ifelse(
-            is.na(.data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-            )]]),
-            0,
-            sqrt(.data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-            )]])
-          ),
-          fill = ifelse(
-            is.na(
-              .data[[paste(
-                "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-              )]]
+        # color scheme
+        ggplot2::scale_color_manual(
+          "Pathway",
+          values = col_univ()
+        ) +
+        # edge attributes
+        ggraph::geom_edge_link(
+          ggplot2::aes(
+            label = ifelse(
+              .data[["set.alpha.edge"]] == 0.25, # nolint
+              "",
+              .data[["enzyme.id"]]
             ),
-            0.5,
-            .data[[paste(
-              "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-            )]]
+            alpha = .data[["set.alpha.edge"]]
           ),
-          color = ifelse(
-            is.na(
-              .data[[paste(
-                "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-              )]]
+          label_dodge = ggplot2::unit(2, "mm"),
+          label_alpha = 0.5,
+          angle_calc = "along",
+          color = "grey50",
+          show.legend = FALSE
+        ) +
+        # Background for node panels
+        ggplot2::geom_rect(
+          ggplot2::aes(
+            xmin = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              x - 0.25 # nolint
             ),
-            "b",
-            "a"
-          )
-        ),
-        position = ggplot2::position_nudge(
-          x = -0.1,
-          y = -0.05
-        ),
-        shape = 21,
-        show.legend = FALSE
-      ) +
-      ggraph::geom_node_point(
-        ggplot2::aes(
-          size = ifelse(
-            is.na(
-              .data[[paste(
-                "n", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-              )]]
+            ymin = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              y - 0.25 # nolint
             ),
-            0,
-            sqrt(.data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-            )]])
-          ),
-          fill = ifelse(
-            is.na(
-              .data[[paste(
-                "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-              )]]
+            ymax = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              y + 0.15
             ),
-            0.5,
-            .data[[paste(
-              "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-            )]]
-          ),
-          color = ifelse(
-            is.na(
-              .data[[paste(
-                "Ratio", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-              )]]
-            ),
-            "b",
-            "a"
-          )
-        ),
-        position = ggplot2::position_nudge(
-          x = 0.1,
-          y = -0.05
-        ),
-        shape = 21,
-        show.legend = FALSE
-      ) +
-      ggplot2::scale_color_manual(
-        "Pathway",
-        values = c("black", "white")
-      ) +
-      ## Change scale
-      ggnewscale::new_scale_color() +
-      # ChemRICH node labels
-      shadowtext::geom_shadowtext(
-        ggplot2::aes(
-          x = x,
-          y = y,
-          label = ifelse(
-            .data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-            )]] == 0,
-            "",
-            "Sat."
-          ),
-          size = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            0.2
-          )
-        ),
-        nudge_x = -0.1,
-        nudge_y = -0.15,
-        color = "white",
-        bg.color = "grey25",
-        show.legend = FALSE
-      ) +
-      shadowtext::geom_shadowtext(
-        ggplot2::aes(
-          x = x,
-          y = y,
-          label = ifelse(
-            .data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-            )]] == 0,
-            "",
-            "Unsat."
-          ),
-          size = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            0.2
-          )
-        ),
-        nudge_x = 0.1,
-        nudge_y = -0.15,
-        color = "white",
-        bg.color = "grey25",
-        show.legend = FALSE
-      ) +
-      # ChemRICH node FDR labels
-      shadowtext::geom_shadowtext(
-        ggplot2::aes(
-          x = x,
-          y = y,
-          label = ifelse(
-            .data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-            )]] == 0 |
-              is.na(.data[[paste(
-                "n", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-              )]]) |
-              .data[[paste(
-                "FDR", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-              )]] > 0.05,
-            "",
-            paste(
-              "FDR =",
-              round(
-                .data[[paste(
-                  "FDR", "SAE:Normoxia-SAE:Hypoxia", "Sat", sep = "_"
-                )]],
-                digits = 4
-              ),
-              sep = " "
+            xmax = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              x + 0.25
             )
           ),
-          size = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            0.2
-          )
-        ),
-        nudge_x = -0.1,
-        nudge_y = -0.2,
-        color = "white",
-        bg.color = "grey10",
-        show.legend = FALSE
-      ) +
-      shadowtext::geom_shadowtext(
-        ggplot2::aes(
-          x = x,
-          y = y,
-          label = ifelse(
-            .data[[paste(
-              "n", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-            )]] == 0 |
-              is.na(.data[[paste(
-                "n", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-              )]]) |
-              .data[[paste(
-                "FDR", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-              )]] > 0.05,
-            "",
-            paste(
-              "FDR =",
-              round(
-                .data[[paste(
-                  "FDR", "SAE:Normoxia-SAE:Hypoxia", "Unsat", sep = "_"
-                )]],
-                digits = 4
-              ),
-              sep = " "
+          alpha = 0.9,
+          fill = "grey",
+          color = "grey25",
+          show.legend = FALSE
+        ) +
+        # node points
+        ggraph::geom_node_point(
+          ggplot2::aes(
+            alpha = ifelse(
+              .data[["set.alpha"]] == 0, # nolint
+              1,
+              0
             )
           ),
-          size = ifelse(
-            .data[["cluster.size"]] == 0,
-            0,
-            0.2
-          )
-        ),
-        nudge_x = 0.1,
-        nudge_y = -0.2,
-        color = "white",
-        bg.color = "grey10",
-        show.legend = FALSE
-      ) +
-      # Increased ratio color scale
-      ggplot2::scale_fill_gradientn(
-        "Increased Ratio",
-        colors = c(
-          "dodgerblue4",
-          "azure",
-          "firebrick3"
-        )
-      ) +
-      ## Change scale
-      ggnewscale::new_scale_color() +
-      ggplot2::scale_size_area(
-        max_size = 16
-      ) +
-      # text labels
-      ggrepel::geom_text_repel(
-        ggplot2::aes(
-          x = .data[["x"]],
-          y = .data[["y"]],
-          label = .data[["label"]],
-          color = .data[["synthesis.pathway"]],
-          alpha = ifelse(
-            .data[["cluster.size"]] == 0,
-            0.1,
-            1
+          color = "grey75",
+          show.legend = FALSE
+        ) +
+        ## Change scale
+        ggnewscale::new_scale_color() +
+        ## Enrichment nodes
+        # ChemRICH nodes
+        ggraph::geom_node_point(
+          ggplot2::aes(
+            size = ifelse(
+              is.na(.data[[paste(
+                "n", comp1, "Sat", sep = "_"
+              )]]),
+              0,
+              sqrt(.data[[paste(
+                "n", comp1, "Sat", sep = "_"
+              )]])
+            ),
+            fill = ifelse(
+              is.na(
+                .data[[paste(
+                  "Ratio", comp1, "Sat", sep = "_"
+                )]]
+              ),
+              0.5,
+              .data[[paste(
+                "Ratio", comp1, "Sat", sep = "_"
+              )]]
+            ),
+            color = ifelse(
+              is.na(
+                .data[[paste(
+                  "Ratio", comp1, "Sat", sep = "_"
+                )]]
+              ),
+              "b",
+              "a"
+            )
           ),
-          size = ifelse(
-            .data[["cluster.size"]] == 0,
-            0.05,
-            0.25
+          position = ggplot2::position_nudge(
+            x = -0.1,
+            y = -0.05
+          ),
+          shape = 21,
+          show.legend = FALSE
+        ) +
+        ggraph::geom_node_point(
+          ggplot2::aes(
+            size = ifelse(
+              is.na(
+                .data[[paste(
+                  "n", comp1, "Unsat", sep = "_"
+                )]]
+              ),
+              0,
+              sqrt(.data[[paste(
+                "n", comp1, "Unsat", sep = "_"
+              )]])
+            ),
+            fill = ifelse(
+              is.na(
+                .data[[paste(
+                  "Ratio", comp1, "Unsat", sep = "_"
+                )]]
+              ),
+              0.5,
+              .data[[paste(
+                "Ratio", comp1, "Unsat", sep = "_"
+              )]]
+            ),
+            color = ifelse(
+              is.na(
+                .data[[paste(
+                  "Ratio", comp1, "Unsat", sep = "_"
+                )]]
+              ),
+              "b",
+              "a"
+            )
+          ),
+          position = ggplot2::position_nudge(
+            x = 0.1,
+            y = -0.05
+          ),
+          shape = 21,
+          show.legend = FALSE
+        ) +
+        ggplot2::scale_color_manual(
+          "Pathway",
+          values = c("black", "white")
+        ) +
+        ## Change scale
+        ggnewscale::new_scale_color() +
+        # ChemRICH node labels
+        shadowtext::geom_shadowtext(
+          ggplot2::aes(
+            x = x,
+            y = y,
+            label = ifelse(
+              .data[[paste(
+                "n", comp1, "Sat", sep = "_"
+              )]] == 0,
+              "",
+              "Sat."
+            ),
+            size = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              0.2
+            )
+          ),
+          nudge_x = -0.1,
+          nudge_y = -0.15,
+          color = "white",
+          bg.color = "grey25",
+          show.legend = FALSE
+        ) +
+        shadowtext::geom_shadowtext(
+          ggplot2::aes(
+            x = x,
+            y = y,
+            label = ifelse(
+              .data[[paste(
+                "n", comp1, "Unsat", sep = "_"
+              )]] == 0,
+              "",
+              "Unsat."
+            ),
+            size = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              0.2
+            )
+          ),
+          nudge_x = 0.1,
+          nudge_y = -0.15,
+          color = "white",
+          bg.color = "grey25",
+          show.legend = FALSE
+        ) +
+        # ChemRICH node FDR labels
+        shadowtext::geom_shadowtext(
+          ggplot2::aes(
+            x = x,
+            y = y,
+            label = ifelse(
+              .data[[paste(
+                "n", comp1, "Sat", sep = "_"
+              )]] == 0 |
+                is.na(.data[[paste(
+                  "n", comp1, "Sat", sep = "_"
+                )]]) |
+                .data[[paste(
+                  "FDR", comp1, "Sat", sep = "_"
+                )]] > 0.05,
+              "",
+              paste(
+                "FDR =",
+                round(
+                  .data[[paste(
+                    "FDR", comp1, "Sat", sep = "_"
+                  )]],
+                  digits = 4
+                ),
+                sep = " "
+              )
+            ),
+            size = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              0.2
+            )
+          ),
+          nudge_x = -0.1,
+          nudge_y = -0.2,
+          color = "white",
+          bg.color = "grey10",
+          show.legend = FALSE
+        ) +
+        shadowtext::geom_shadowtext(
+          ggplot2::aes(
+            x = x,
+            y = y,
+            label = ifelse(
+              .data[[paste(
+                "n", comp1, "Unsat", sep = "_"
+              )]] == 0 |
+                is.na(.data[[paste(
+                  "n", comp1, "Unsat", sep = "_"
+                )]]) |
+                .data[[paste(
+                  "FDR", comp1, "Unsat", sep = "_"
+                )]] > 0.05,
+              "",
+              paste(
+                "FDR =",
+                round(
+                  .data[[paste(
+                    "FDR", comp1, "Unsat", sep = "_"
+                  )]],
+                  digits = 4
+                ),
+                sep = " "
+              )
+            ),
+            size = ifelse(
+              .data[["cluster.size"]] == 0,
+              0,
+              0.2
+            )
+          ),
+          nudge_x = 0.1,
+          nudge_y = -0.2,
+          color = "white",
+          bg.color = "grey10",
+          show.legend = FALSE
+        ) +
+        # Increased ratio color scale
+        ggplot2::scale_fill_gradientn(
+          "Increased Ratio",
+          colors = c(
+            "dodgerblue4",
+            "azure",
+            "firebrick3"
           )
-        ),
-        bg.r = 0.025,
-        bg.color = "grey10",
-        nudge_x = 0,
-        nudge_y = 0.1 * 1,
-        show.legend = FALSE
-      ) +
-      ggplot2::scale_color_manual(
-        "Pathway",
-        values = col_univ()
-      ) +
-      # plot theme
-      ms_theme1() +
-      ms_theme_net()
+        ) +
+        ## Change scale
+        ggnewscale::new_scale_color() +
+        ggplot2::scale_size_area(
+          max_size = 16
+        ) +
+        # text labels
+        ggrepel::geom_text_repel(
+          ggplot2::aes(
+            x = .data[["x"]],
+            y = .data[["y"]],
+            label = .data[["label"]],
+            color = .data[["synthesis.pathway"]],
+            alpha = ifelse(
+              .data[["cluster.size"]] == 0,
+              0.1,
+              1
+            ),
+            size = ifelse(
+              .data[["cluster.size"]] == 0,
+              0.05,
+              0.25
+            )
+          ),
+          bg.r = 0.025,
+          bg.color = "grey10",
+          nudge_x = 0,
+          nudge_y = 0.1 * 1,
+          show.legend = FALSE
+        ) +
+        ggplot2::scale_color_manual(
+          "Pathway",
+          values = col_univ()
+        ) +
+        # plot theme
+        ms_theme1() +
+        ms_theme_net()
+    }
+    #   if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
+    # }
+    # if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
+    # }
+    # if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
+    # }
+    # if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
+    # }
   }
   return(net_plot2)
 }

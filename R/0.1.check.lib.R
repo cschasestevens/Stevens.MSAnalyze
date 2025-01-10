@@ -26,7 +26,9 @@ ms_check_lib <- function() {
     "umap",
     "mvnormtest",
     "grid",
-    "circlize"
+    "circlize",
+    "DBI",
+    "RSQLite"
   )
 
   list_pkg_BIOC <- c( # nolint

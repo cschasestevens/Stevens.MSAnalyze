@@ -39,7 +39,9 @@ Utilizes various R packages to perform processing and analysis of metabolomics a
         * grid,
         * EnhancedVolcano,
         * circlize,
-        * ComplexHeatmap
+        * ComplexHeatmap,
+        * DBI,
+        * RSQLite
 
 ### Installation
 * Run the following in a new R session on the command line or within R-Studio:
@@ -48,8 +50,8 @@ Utilizes various R packages to perform processing and analysis of metabolomics a
 devtools::install_github(
   "cschasestevens/Stevens.MSAnalyze", 
   ref = "master", 
-  build_vignettes = T
-  )
+  build_vignettes = TRUE
+)
 ```
 
 ## Help
@@ -74,7 +76,8 @@ browseVignettes("Stevens.MSAnalyze")
 * LinkedIn: https://www.linkedin.com/in/nathanial-chase-stevens-phd-08775180/
 
 ## Version History
-* 1.1 (In Progress)
+* 1.1
+    * Added compatibility for plotting enrichment results onto a network diagram (lipidomics only)
     * Added functions for regression and correlation analysis
     * Additional plotting functions for violin plots
 * 1.0
