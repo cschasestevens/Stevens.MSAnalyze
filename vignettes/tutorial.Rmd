@@ -28,9 +28,10 @@ vignette: >
 ### 4.1. Dimension Reduction: PCA/UMAP/PLSDA
 ### 4.2. Statistics: ANOVA 1-, 2-, or 3-Variable and Visualization **(Devlopment)**
 ### 4.3. ChemRICH and Visualization
-### 4.4. Correlation
-### 4.5. Regression **(Devlopment)**
-### 4.6. Network Analysis **(Devlopment)**
+### 4.4. Lipid Network Plots **(Development)**
+### 4.5. Correlation **(Development)**
+### 4.6. Regression **(Devlopment)**
+### 4.7. Network Analysis **(Devlopment)**
 ### 4.8. Tanglegram/ML-based comparisons between data sets **(Devlopment)**
 
 ## **Scripts:**
@@ -63,6 +64,7 @@ browseVignettes("Stevens.MSAnalyze")
 # Connect to local database (only if performing ChemRICH for lipidomics data)
 ## Verify that lipidref.db has been downloaded and placed in the "ref" folder
 ## from the "main" branch of Stevens.MSAnalyze before connecting to database
+setwd("/home/ncsteven/analyze/Chase.MSAnalyze")
 db1 <- DBI::dbConnect(RSQLite::SQLite(), "ref/lipidref.db")
 ## Use DBI::dbDisconnect(db1) followed by
 ## DBI::unlink("database name") to disconnect from the database
@@ -71,7 +73,6 @@ db1 <- DBI::dbConnect(RSQLite::SQLite(), "ref/lipidref.db")
 ### 1.2. Define Parameters and Upload Data
 ```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Load data or use example data
-head(example1)
 d <- ms_input(
   # Metadata column number
   md_num = 4,
@@ -128,8 +129,8 @@ dev.off()
 # Total and Group-wise Annotation Information (Displayed as Sunburst plot)
 names(d[["data"]][["anno"]])
 d_an <- ms_plot_anno(
-  d,
-  c("Major.Class", "Class", "Subclass")
+  ld = d,
+  md = c("Major_Class", "Class", "Subclass")
 )
 # Plot annotations
 ggplot2::ggsave(
@@ -145,20 +146,19 @@ ggplot2::ggsave(
 ### 3.1. Fold Change Calculation
 ```{r, echo = TRUE, fig.align= "center", results=F, message=F, warning=F, eval = FALSE}
 # Fold Change - Individual
+names(d[["data"]])
 d[["fc"]] <- ms_stat_fc(
   mat1 = d[["data"]][["imputed"]],
   md = d[["data"]][["meta"]],
-  md_var = c("Organ", "Sex", "Dose"),
-  an = d[["data"]][["anno"]],
-  fc_class = FALSE,
-  grp_class = "Subclass"
+  md_var = c("Group"),
+  an = d[["data"]][["anno"]]
 )
 head(d[["fc"]])
 ## Fold Change - Class
 d[["fcc"]] <- ms_stat_fc(
   mat1 = d[["data"]][["imputed"]],
   md = d[["data"]][["meta"]],
-  md_var = c("Organ", "Sex", "Dose"),
+  md_var = c("Group"),
   an = d[["data"]][["anno"]],
   fc_class = TRUE,
   grp_class = "Subclass"
@@ -180,11 +180,10 @@ set.seed(1234)
 d[["plots"]][["plot.pca"]] <- ms_dim_rd(
   mat1 = d[["data"]][["data.pareto"]],
   md = d[["data"]][["meta"]],
-  md_var = c("Organ"),
+  md_var = c("Group"),
   dim_type = "PCA",
-  dim1 = "3D",
-  p_type = "single",
-  p_lab = FALSE
+  dim1 = "2D",
+  p_type = "single"
 )
 ggplot2::ggsave(
   "analysis/plot.dr2D.pca.Group.png",
@@ -197,11 +196,10 @@ ggplot2::ggsave(
 d[["plots"]][["plot.umap"]] <- ms_dim_rd(
   mat1 = d[["data"]][["data.pareto"]],
   md = d[["data"]][["meta"]],
-  md_var = c("Organ"),
+  md_var = c("Group"),
   dim_type = "UMAP",
   dim1 = "3D",
-  p_type = "single",
-  p_lab = FALSE
+  p_type = "single"
 )
 ggplot2::ggsave(
   "analysis/plot.dr2D.umap.Group.png",
@@ -219,10 +217,8 @@ d[["stats"]] <- ms_stat_anova(
   matpv = d[["data"]][["data.pareto"]],
   matfc = d[["data"]][["imputed"]],
   md = d[["data"]][["meta"]],
-  md_var = c("Organ", "Sex", "Dose"),
-  an = d[["data"]][["anno"]],
-  fc_class1 = FALSE,
-  grp_class1 = "Subclass"
+  md_var = c("Group"),
+  an = d[["data"]][["anno"]]
 )
 # Determine number of significant compounds in each comparison
 num_sig <- setNames(
@@ -241,6 +237,13 @@ write.table(
   sep = "\t",
   col.names = TRUE,
   row.names = FALSE
+)
+write.table(
+  d[["stats"]],
+  "analysis/table.stats.txt",
+  col.names = TRUE,
+  row.names = FALSE,
+  sep = "\t"
 )
 
 # Plots (Volcano, Heatmap, and Violin Plot **(Development)**)
@@ -329,7 +332,6 @@ h_out <- ms_plot_heat(
   cl_c = TRUE,
   cl_r = TRUE
 )
-
 png(
   "analysis/plot.heatmap.comp1.vs.comp2.png",
   width = 44,
@@ -339,7 +341,6 @@ png(
 )
 print(h_out)
 dev.off()
-
 ```
 
 ### 4.3. ChemRICH and Visualization
@@ -348,15 +349,17 @@ dev.off()
 d[["chemrich"]] <- ms_stat_crich(
   d_stat = d[["stats"]],
   d_ref = d[["data"]][["anno"]],
-  cl_name = "label.saturation"
+  cl_name = "label_saturation"
 )
+head(d[["chemrich"]])
 
 # Return comparisons with at least one significantly enriched cluster
 cr_sig <- d[["chemrich"]][d[["chemrich"]][["FDR"]] < 0.05, ]
+head(cr_sig)
 length(unique(cr_sig[["Comparison"]]))
 nrow(cr_sig)
 unique(cr_sig[["Cluster"]])
-unique(cr_sig[["Comparison"]])
+unique(cr_sig[["label"]])
 
 # Plot ChemRICH with significantly enriched clusters
 lapply(
@@ -380,5 +383,56 @@ lapply(
       dpi = 400
     )
   }
+)
+```
+
+### 4.4 Lipid Network Plots **(Development)**
+```{r, echo = TRUE, results=F, message=F, warning=F, eval = FALSE}
+head(d[["chemrich"]])
+## Pathway Legend
+ms_plot_lipidnet(
+  net_type = "pathways_legend"
+)
+## Base network
+ms_plot_lipidnet(
+  net_type = "base"
+)
+## Plot dataset annotations
+ms_plot_lipidnet(
+  d_enrch = d[["chemrich"]],
+  net_type = "annotation",
+  cl_var = "label_saturation"
+)
+## Plot dataset enrichment results
+ms_plot_lipidnet(
+  d_enrch = d[["chemrich"]],
+  net_type = "enrichment",
+  cl_var = "label_saturation",
+  comp1 = "HFA_F-BR",
+  comp_sat = TRUE
+)
+## Save
+ggplot2::ggsave(
+  "analysis/testnet.png",
+  ms_plot_lipidnet(
+    d_enrch = d[["chemrich"]],
+    net_type = "enrichment",
+    cl_var = "label_saturation",
+    comp1 = "HFA_F-BR",
+    comp_sat = TRUE
+  ),
+  width = 16,
+  height = 12,
+  dpi = 600
+)
+## Save legend only
+ggplot2::ggsave(
+  "analysis/testnet_legend.png",
+  ms_plot_lipidnet(
+    net_type = "pathways_legend"
+  ),
+  width = 8,
+  height = 6,
+  dpi = 600
 )
 ```

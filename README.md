@@ -42,6 +42,9 @@ Utilizes various R packages to perform processing and analysis of metabolomics a
         * ComplexHeatmap,
         * DBI,
         * RSQLite
+        * ggnewscale,
+        * magrittr,
+        * tidyr
 
 ### Installation
 * Run the following in a new R session on the command line or within R-Studio:

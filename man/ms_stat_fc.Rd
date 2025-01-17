@@ -4,7 +4,7 @@
 \alias{ms_stat_fc}
 \title{Group-wise Fold Change Function}
 \usage{
-ms_stat_fc(mat1, md, md_var, an, fc_class, grp_class)
+ms_stat_fc(mat1, md, md_var, an, fc_class = FALSE, grp_class = NULL)
 }
 \arguments{
 \item{mat1}{Data matrix assigned by ms_input().}

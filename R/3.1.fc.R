@@ -27,16 +27,24 @@
 #' # )
 #'
 #' @export
-ms_stat_fc <- function(mat1, md, md_var, an, fc_class, grp_class) {
+ms_stat_fc <- function(
+  mat1,
+  md,
+  md_var,
+  an,
+  fc_class = FALSE,
+  grp_class = NULL
+) {
   if(fc_class == FALSE) { # nolint
     d1 <- mat1
     md1 <- md
     an1 <- an
+    md_var1 <- md_var
     # Group Combinations
     var_comb <- dplyr::bind_rows(lapply(
-      seq.int(0, length(md_var) - 1, 1),
+      seq.int(0, length(md_var1) - 1, 1),
       function(x) {
-        cb1 <- combn(md_var, x + 1)
+        cb1 <- combn(md_var1, x + 1)
         cb1 <- as.data.frame(t(
           dplyr::bind_cols(
             lapply(
@@ -48,45 +56,77 @@ ms_stat_fc <- function(mat1, md, md_var, an, fc_class, grp_class) {
         return(cb1)
       }
     ))
-
-    fold_comb <- dplyr::bind_rows(
-      lapply(
-        seq.int(1, nrow(var_comb), 1),
-        function(x) {
-          cb1 <- paste(unlist(strsplit(var_comb[x, 1], ":")), sep = ", ")
-          # Change variable to factor
-          cb2 <- setNames(
-            as.data.frame(
-              lapply(
-                cb1,
-                function(y) as.character(md1[, y])
-              )
-            ),
-            c(cb1)
-          )
-          cb2 <- unique(cb2)
-          # Combine columns
-          cb2[["comb"]] <- unlist(
-            lapply(
-              as.data.frame(t(cb2)),
-              function(z) paste(z, collapse = ":")
+    if(nrow(var_comb) == 1) { # nolint
+      cb1 <- paste(unlist(strsplit(var_comb[1, 1], ":")), sep = ", ")
+      # Change variable to factor
+      cb2 <- setNames(
+        as.data.frame(
+          as.character(md1[[md_var1]])
+        ),
+        c(cb1)
+      )
+      cb2 <- as.data.frame(unique(cb2))
+      # Combine columns
+      cb2[["comb"]] <- unlist(
+        lapply(
+          as.data.frame(t(cb2)),
+          function(z) paste(z, collapse = ":")
+        )
+      )
+      cb2
+      # Determine combinations
+      fold_comb <- as.data.frame(
+        t(
+          unique(
+            combn(
+              sort(cb2[["comb"]], decreasing = TRUE),
+              2
             )
           )
-          # Determine combinations
-          cb2 <- as.data.frame(
-            t(
-              unique(
-                combn(
-                  sort(cb2[["comb"]], decreasing = TRUE),
-                  2
+        )
+      )
+      fold_comb
+    }
+    if(nrow(var_comb) > 1) { # nolint
+      fold_comb <- dplyr::bind_rows(
+        lapply(
+          seq.int(1, nrow(var_comb), 1),
+          function(x) {
+            cb1 <- paste(unlist(strsplit(var_comb[x, 1], ":")), sep = ", ")
+            # Change variable to factor
+            cb2 <- setNames(
+              as.data.frame(
+                lapply(
+                  cb1,
+                  function(y) as.character(md1[, y])
+                )
+              ),
+              c(cb1)
+            )
+            cb2 <- unique(cb2)
+            # Combine columns
+            cb2[["comb"]] <- unlist(
+              lapply(
+                as.data.frame(t(cb2)),
+                function(z) paste(z, collapse = ":")
+              )
+            )
+            # Determine combinations
+            cb2 <- as.data.frame(
+              t(
+                unique(
+                  combn(
+                    sort(cb2[["comb"]], decreasing = TRUE),
+                    2
+                  )
                 )
               )
             )
-          )
-          return(cb2)
-        }
+            return(cb2)
+          }
+        )
       )
-    )
+    }
     # Metabolite Group Means (excluding missing samples)
     fold_mean <- dplyr::bind_rows(
       setNames(
@@ -118,7 +158,6 @@ ms_stat_fc <- function(mat1, md, md_var, an, fc_class, grp_class) {
         var_comb[[1]]
       )
     )
-
     # Group Fold Changes
     fun.comb <- function(x, y) {x / y} # nolint
     fold_all <- setNames(
@@ -148,8 +187,6 @@ ms_stat_fc <- function(mat1, md, md_var, an, fc_class, grp_class) {
     fold_all[["Comparison.fc"]] <- as.character(fold_all[["Comparison.fc"]])
   }
 
-
-
   if(fc_class == TRUE) { # nolint
     d1 <- mat1
     an1 <- an
@@ -178,44 +215,77 @@ ms_stat_fc <- function(mat1, md, md_var, an, fc_class, grp_class) {
       }
     ))
 
-    fold_comb <- dplyr::bind_rows(
-      lapply(
-        seq.int(1, nrow(var_comb), 1),
-        function(x) {
-          cb1 <- paste(unlist(strsplit(var_comb[x, 1], ":")), sep = ", ")
-          # Change variable to factor
-          cb2 <- setNames(
-            as.data.frame(
-              lapply(
-                cb1,
-                function(y) as.character(md1[, y])
-              )
-            ),
-            c(cb1)
-          )
-          cb2 <- unique(cb2)
-          # Combine columns
-          cb2[["comb"]] <- unlist(
-            lapply(
-              as.data.frame(t(cb2)),
-              function(z) paste(z, collapse = ":")
+    if(nrow(var_comb) == 1) { # nolint
+      cb1 <- paste(unlist(strsplit(var_comb[1, 1], ":")), sep = ", ")
+      # Change variable to factor
+      cb2 <- setNames(
+        as.data.frame(
+          as.character(md1[[md_var1]])
+        ),
+        c(cb1)
+      )
+      cb2 <- as.data.frame(unique(cb2))
+      # Combine columns
+      cb2[["comb"]] <- unlist(
+        lapply(
+          as.data.frame(t(cb2)),
+          function(z) paste(z, collapse = ":")
+        )
+      )
+      cb2
+      # Determine combinations
+      fold_comb <- as.data.frame(
+        t(
+          unique(
+            combn(
+              sort(cb2[["comb"]], decreasing = TRUE),
+              2
             )
           )
-          # Determine combinations
-          cb2 <- as.data.frame(
-            t(
-              unique(
-                combn(
-                  sort(cb2[["comb"]], decreasing = TRUE),
-                  2
+        )
+      )
+      fold_comb
+    }
+    if(nrow(var_comb) > 1) { # nolint
+      fold_comb <- dplyr::bind_rows(
+        lapply(
+          seq.int(1, nrow(var_comb), 1),
+          function(x) {
+            cb1 <- paste(unlist(strsplit(var_comb[x, 1], ":")), sep = ", ")
+            # Change variable to factor
+            cb2 <- setNames(
+              as.data.frame(
+                lapply(
+                  cb1,
+                  function(y) as.character(md1[, y])
+                )
+              ),
+              c(cb1)
+            )
+            cb2 <- unique(cb2)
+            # Combine columns
+            cb2[["comb"]] <- unlist(
+              lapply(
+                as.data.frame(t(cb2)),
+                function(z) paste(z, collapse = ":")
+              )
+            )
+            # Determine combinations
+            cb2 <- as.data.frame(
+              t(
+                unique(
+                  combn(
+                    sort(cb2[["comb"]], decreasing = TRUE),
+                    2
+                  )
                 )
               )
             )
-          )
-          return(cb2)
-        }
+            return(cb2)
+          }
+        )
       )
-    )
+    }
     # Metabolite Group Means (excluding missing samples)
     fold_mean <- dplyr::bind_rows(
       setNames(

@@ -33,7 +33,14 @@
 #'
 #' @export
 ms_dim_rd <- function( # nolint
-  mat1, md, md_var, dim_type, ret_umap, dim1, p_type, p_lab
+  mat1,
+  md,
+  md_var,
+  dim_type,
+  ret_umap = FALSE,
+  dim1,
+  p_type,
+  p_lab = TRUE
 ) {
   d1 <- mat1
   md1 <- md

@@ -4,7 +4,15 @@
 \alias{ms_stat_anova}
 \title{Multivariate ANOVA}
 \usage{
-ms_stat_anova(matpv, matfc, md, md_var, an, fc_class1, grp_class1)
+ms_stat_anova(
+  matpv,
+  matfc,
+  md,
+  md_var,
+  an,
+  fc_class1 = FALSE,
+  grp_class1 = NULL
+)
 }
 \arguments{
 \item{matpv}{Data matrix for conducting ANOVA.}

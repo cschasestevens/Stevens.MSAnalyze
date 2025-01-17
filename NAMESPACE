@@ -2,6 +2,7 @@
 
 export(col_grad)
 export(col_univ)
+export(ms_add_anno)
 export(ms_check_lib)
 export(ms_data_check)
 export(ms_dim_rd)
@@ -16,3 +17,4 @@ export(ms_stat_crich)
 export(ms_stat_fc)
 export(ms_theme1)
 export(ms_theme_net)
+export(ms_theme_net2)

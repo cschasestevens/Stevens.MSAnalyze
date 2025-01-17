@@ -28,7 +28,15 @@
 #' # )
 #'
 #' @export
-ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) { # nolint
+ms_stat_anova <- function( # nolint
+  matpv,
+  matfc,
+  md,
+  md_var,
+  an,
+  fc_class1 = FALSE,
+  grp_class1 = NULL
+) { # nolint
   if(Sys.info()[["sysname"]] != "Windows") { # nolint
     if(fc_class1 == FALSE){ # nolint
       # Determine interactions between selected variables
@@ -212,14 +220,6 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
         ),
         fold_all,
         by = c("Comparison.fc", "Name")
-      )
-      head(d_out)
-      write.table(
-        d_out,
-        "analysis/table.stats.txt",
-        col.names = TRUE,
-        row.names = FALSE,
-        sep = "\t"
       )
     }
 
@@ -411,13 +411,6 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
         ),
         fold_all,
         by = c("Comparison.fc", "Name")
-      )
-      write.table(
-        d_out,
-        "analysis/table.stats.class.txt",
-        col.names = TRUE,
-        row.names = FALSE,
-        sep = "\t"
       )
     }
   }
@@ -603,13 +596,6 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
         by = c("Comparison.fc", "Name")
       )
       head(d_out)
-      write.table(
-        d_out,
-        "analysis/table.stats.txt",
-        col.names = TRUE,
-        row.names = FALSE,
-        sep = "\t"
-      )
     }
 
     if(fc_class1 == TRUE){ # nolint
@@ -788,7 +774,6 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
           )
         )
       )
-
       d_out <- dplyr::left_join(
         dplyr::left_join(
           d_mult,
@@ -797,13 +782,6 @@ ms_stat_anova <- function(matpv, matfc, md, md_var, an, fc_class1, grp_class1) {
         ),
         fold_all,
         by = c("Comparison.fc", "Name")
-      )
-      write.table(
-        d_out,
-        "analysis/table.stats.class.txt",
-        col.names = TRUE,
-        row.names = FALSE,
-        sep = "\t"
       )
     }
   }

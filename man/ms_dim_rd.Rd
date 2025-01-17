@@ -4,7 +4,16 @@
 \alias{ms_dim_rd}
 \title{Dimension Reduction}
 \usage{
-ms_dim_rd(mat1, md, md_var, dim_type, ret_umap, dim1, p_type, p_lab)
+ms_dim_rd(
+  mat1,
+  md,
+  md_var,
+  dim_type,
+  ret_umap = FALSE,
+  dim1,
+  p_type,
+  p_lab = TRUE
+)
 }
 \arguments{
 \item{mat1}{Pareto-scaled data matrix returned by ms_data_check().}
