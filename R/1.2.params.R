@@ -94,14 +94,15 @@ ms_input <- function( # nolint
     if(is.null(ref1) == TRUE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master') # nolint
+        'select * from master' # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master where "Source" =', ref1)
+        'select * from master' # nolint
       )
+      r1 <- r1[r1[["Source"]] == ref1, ]
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
@@ -142,14 +143,15 @@ ms_input <- function( # nolint
     if(is.null(ref1) == TRUE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master') # nolint
+        'select * from master' # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master where "Source" =', ref1)
+        'select * from master' # nolint
       )
+      r1 <- r1[r1[["Source"]] == ref1, ]
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
@@ -191,14 +193,15 @@ ms_input <- function( # nolint
     if(is.null(ref1) == TRUE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master') # nolint
+        'select * from master' # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
       r1 <- DBI::dbGetQuery(
         db1, # nolint
-        paste('select * from master where "Source" =', ref1)
+        'select * from master' # nolint
       )
+      r1 <- r1[r1[["Source"]] == ref1, ]
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
