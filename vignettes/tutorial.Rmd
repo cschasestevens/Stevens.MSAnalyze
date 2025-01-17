@@ -26,9 +26,9 @@ vignette: >
 
 ## 4. Statistics and Hypothesis Testing
 ### 4.1. Dimension Reduction: PCA/UMAP/PLSDA
-### 4.2. Statistics: ANOVA 1-, 2-, or 3-Variable and Visualization **(Devlopment)**
+### 4.2. Statistics: ANOVA 1-, 2-, or 3-Variable and Visualization
 ### 4.3. ChemRICH and Visualization
-### 4.4. Lipid Network Plots **(Development)**
+### 4.4. Lipid Network Plots
 ### 4.5. Correlation **(Development)**
 ### 4.6. Regression **(Devlopment)**
 ### 4.7. Network Analysis **(Devlopment)**
@@ -386,7 +386,7 @@ lapply(
 )
 ```
 
-### 4.4 Lipid Network Plots **(Development)**
+### 4.4 Lipid Network Plots
 ```{r, echo = TRUE, results=F, message=F, warning=F, eval = FALSE}
 head(d[["chemrich"]])
 ## Pathway Legend

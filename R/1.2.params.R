@@ -92,14 +92,16 @@ ms_input <- function( # nolint
       )
     )
     if(is.null(ref1) == TRUE) { # nolint
-      r1 <- read.table(
-        "ref/0.masterlist.txt",
-        header = TRUE,
-        sep = "\t"
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master') # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
-      r1 <- ref1
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master where "Source" =', ref1)
+      )
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
@@ -137,15 +139,17 @@ ms_input <- function( # nolint
         "an.comp"
       )
     )
-    if(missing(ref1) == TRUE) { # nolint
-      r1 <- read.table(
-        "ref/0.masterlist.txt",
-        header = TRUE,
-        sep = "\t"
+    if(is.null(ref1) == TRUE) { # nolint
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master') # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
-      r1 <- ref1
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master where "Source" =', ref1)
+      )
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
@@ -184,15 +188,17 @@ ms_input <- function( # nolint
         "an.comp"
       )
     )
-    if(missing(ref1) == TRUE) { # nolint
-      r1 <- read.table(
-        "ref/0.masterlist.txt",
-        header = TRUE,
-        sep = "\t"
+    if(is.null(ref1) == TRUE) { # nolint
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master') # nolint
       )
     }
     if(missing(ref1) == FALSE) { # nolint
-      r1 <- ref1
+      r1 <- DBI::dbGetQuery(
+        db1, # nolint
+        paste('select * from master where "Source" =', ref1)
+      )
     }
     lpar <- list(
       "data" = d[, -c(1:md_num, a1[a1[["type"]] == "iSTD", "ID"] + md_num)],
