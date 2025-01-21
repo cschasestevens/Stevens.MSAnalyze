@@ -48,7 +48,7 @@ of the following methods: PCA, UMAP, PLSDA.
 \examples{
 
 # ms_dim_rd(
-#   mat1 = d[["data"]][["data.pareto"]],
+#   mat1 = d[["data"]][["data.scale"]],
 #   md = d[["data"]][["meta"]],
 #   md_var = c("Organ"),
 #   dim_type = "PCA",

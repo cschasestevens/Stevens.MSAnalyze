@@ -43,7 +43,7 @@ for each group comparison.
 \examples{
 
 # ms_stat_anova(
-#   matpv = d[["data"]][["data.pareto"]],
+#   matpv = d[["data"]][["data.scale"]],
 #   matfc = d[["data"]][["imputed"]],
 #   md = d[["data"]][["meta"]],
 #   md_var = c("Organ", "Sex", "Dose"),
