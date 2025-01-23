@@ -6,6 +6,8 @@
 #'
 #' @param matpv Data matrix for conducting ANOVA.
 #' @param matfc Data matrix for calculating fold change.
+#' @param matfc_type Input data type for calculating fold change;
+#' either "norm" or "scaled."
 #' @param md Metadata from ms_input().
 #' @param md_var Metadata variables to test by ANOVA.
 #' @param an Reference annotation data frame.
@@ -31,6 +33,7 @@
 ms_stat_anova <- function( # nolint
   matpv,
   matfc,
+  matfc_type = "norm",
   md,
   md_var,
   an,
@@ -180,14 +183,28 @@ ms_stat_anova <- function( # nolint
       }
 
       # Add fold change
-      fold_all <- ms_stat_fc( # nolint
-        mat1 = matfc,
-        md = md1,
-        md_var = md_var,
-        an = an1,
-        fc_class = fc_class1,
-        grp_class = grp_class1
-      )
+      if(matfc_type == "norm") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "norm",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
+      if(matfc_type == "scaled") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "scaled",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
 
       # Fix anova comparisons to match fold change comparisons
       dm_fix <- data.frame(
@@ -371,14 +388,29 @@ ms_stat_anova <- function( # nolint
       }
 
       # Add fold change
-      fold_all <- ms_stat_fc( # nolint
-        mat1 = matfc,
-        md = md1,
-        md_var = md_var,
-        an = an1,
-        fc_class = fc_class1,
-        grp_class = grp_class1
-      )
+      # Add fold change
+      if(matfc_type == "norm") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "norm",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
+      if(matfc_type == "scaled") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "scaled",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
 
       # Fix anova comparisons to match fold change comparisons
       dm_fix <- data.frame(
@@ -554,14 +586,28 @@ ms_stat_anova <- function( # nolint
       }
 
       # Add fold change
-      fold_all <- ms_stat_fc( # nolint
-        mat1 = matfc,
-        md = md1,
-        md_var = md_var,
-        an = an1,
-        fc_class = fc_class1,
-        grp_class = grp_class1
-      )
+      if(matfc_type == "norm") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "norm",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
+      if(matfc_type == "scaled") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "scaled",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
 
       # Fix anova comparisons to match fold change comparisons
       dm_fix <- data.frame(
@@ -743,14 +789,28 @@ ms_stat_anova <- function( # nolint
       }
 
       # Add fold change
-      fold_all <- ms_stat_fc( # nolint
-        mat1 = matfc,
-        md = md1,
-        md_var = md_var,
-        an = an1,
-        fc_class = fc_class1,
-        grp_class = grp_class1
-      )
+      if(matfc_type == "norm") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "norm",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
+      if(matfc_type == "scaled") { # nolint
+        fold_all <- ms_stat_fc( # nolint
+          mat1 = matfc,
+          mat_type = "scaled",
+          md = md1,
+          md_var = md_var,
+          an = an1,
+          fc_class = fc_class1,
+          grp_class = grp_class1
+        )
+      }
 
       # Fix anova comparisons to match fold change comparisons
       dm_fix <- data.frame(

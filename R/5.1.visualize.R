@@ -364,10 +364,10 @@ ms_plot_lipidnet <- function( # nolint
       ) +
       ggplot2::scale_fill_manual(
         "Pathway",
-        values = col_univ()
+        values = col_univ() # nolint
       ) +
-      ms_theme1() +
-      ms_theme_net2()
+      ms_theme1() + # nolint
+      ms_theme_net2() # nolint
   }
   # Base network
   if(net_type == "base") { # nolint
@@ -408,7 +408,7 @@ ms_plot_lipidnet <- function( # nolint
       # color scheme
       ggplot2::scale_fill_manual(
         "Pathway",
-        values = col_univ()
+        values = col_univ() # nolint
       ) +
       # text labels
       ggrepel::geom_text_repel(
@@ -425,8 +425,8 @@ ms_plot_lipidnet <- function( # nolint
         size = 5
       ) +
       # plot theme
-      ms_theme1() +
-      ms_theme_net()
+      ms_theme1() + # nolint
+      ms_theme_net() # nolint
   }
 
   ## Annotation network
@@ -525,7 +525,7 @@ ms_plot_lipidnet <- function( # nolint
       # color scheme
       ggplot2::scale_fill_manual(
         "Pathway",
-        values = col_univ()
+        values = col_univ() # nolint
       ) +
       ggplot2::scale_size_area(
         max_size = 16
@@ -545,8 +545,8 @@ ms_plot_lipidnet <- function( # nolint
         size = 5
       ) +
       # plot theme
-      ms_theme1() +
-      ms_theme_net()
+      ms_theme1() + # nolint
+      ms_theme_net() # nolint
   }
 
   # Enrichment network
@@ -623,7 +623,7 @@ ms_plot_lipidnet <- function( # nolint
         # color scheme
         ggplot2::scale_color_manual(
           "Pathway",
-          values = col_univ()
+          values = col_univ() # nolint
         ) +
         ggplot2::scale_fill_manual(
           "Pathway",
@@ -992,8 +992,8 @@ ms_plot_lipidnet <- function( # nolint
           values = col_univ()
         ) +
         # plot theme
-        ms_theme1() +
-        ms_theme_net()
+        ms_theme1() + # nolint
+        ms_theme_net() # nolint
     }
     #   if(length(comp1) == 1 && comp_sat == TRUE) { # nolint
     # }
