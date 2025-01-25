@@ -1110,6 +1110,50 @@ ms_plot_lipidnet <- function( # nolint
       0.25
     )
     cmp <- comp1
+    net_edges[["sat_col"]] <- ifelse(
+      is.na(net_edges[[paste(
+        "Log2FC", cmp, "Sat", sep = "_"
+      )]]) |
+        unlist(
+          lapply(
+            net_edges[[paste(
+              "Log2FC", cmp, "Sat", sep = "_"
+            )]],
+            function(x) is.null(x)
+          )
+        ),
+      0,
+      unlist(net_edges[[paste(
+        "Log2FC", cmp, "Sat", sep = "_"
+      )]])
+    )
+    net_edges[["sat_col"]] <- ifelse(
+      net_edges[["sat_col"]] < 0,
+      "dodgerblue4",
+      ifelse(net_edges[["sat_col"]] > 0, "firebrick3", "white")
+    )
+    net_edges[["unsat_col"]] <- ifelse(
+      is.na(net_edges[[paste(
+        "Log2FC", cmp, "Unsat", sep = "_"
+      )]]) |
+        unlist(
+          lapply(
+            net_edges[[paste(
+              "Log2FC", cmp, "Unsat", sep = "_"
+            )]],
+            function(x) is.null(x)
+          )
+        ),
+      0,
+      unlist(net_edges[[paste(
+        "Log2FC", cmp, "Unsat", sep = "_"
+      )]])
+    )
+    net_edges[["unsat_col"]] <- ifelse(
+      net_edges[["unsat_col"]] < 0,
+      "dodgerblue4",
+      ifelse(net_edges[["unsat_col"]] > 0, "firebrick3", "white")
+    )
     ## Network
     net_plot <- igraph::graph_from_data_frame(
       net_edges,
@@ -1123,14 +1167,9 @@ ms_plot_lipidnet <- function( # nolint
     net_plot2 <- ggraph::ggraph(
       net_plot_lay
     ) +
-      # color scheme
-      ggplot2::scale_color_manual(
-        "Pathway",
-        values = col_univ() # nolint
-      ) +
       ggplot2::scale_fill_manual(
         "Pathway",
-        values = col_univ()
+        values = col_univ() # nolint
       ) +
       # Boundary polygon for distinguishing different pathways
       ggplot2::geom_polygon(
@@ -1144,9 +1183,64 @@ ms_plot_lipidnet <- function( # nolint
         color = "grey25",
         show.legend = FALSE
       ) +
-      
-      ## Add additional attributes for fold change between links START HERE 1/25/25
-      # edge attributes
+      ## Color scale for edges
+      ggplot2::scale_color_manual(
+        "Log2FC",
+        values = c("dodgerblue4", "white", "firebrick3")
+      ) +
+      ## Saturated lipid class links
+      ggraph::geom_edge_link(
+        ggplot2::aes(
+          edge_alpha = ifelse(
+            .data[["set_alpha_edge"]] == 0.25 | # nolint
+              .data[["sat_col"]] == "white", # nolint
+            0,
+            .data[["set_alpha_edge"]]
+          ),
+          edge_color = .data[["sat_col"]]
+        ),
+        position = ggplot2::position_nudge(
+          x = -0.03,
+          y = 0.06
+        ),
+        edge_linetype = "twodash",
+        edge_width = 1.25,
+        end_cap = ggraph::circle(5, "mm"),
+        lineend = "round",
+        arrow = grid::arrow(
+          length = ggplot2::unit(2, "mm"),
+          type = "closed"
+        ),
+        angle_calc = "along",
+        show.legend = FALSE
+      ) +
+      ## Unsaturated lipid class links
+      ggraph::geom_edge_link(
+        ggplot2::aes(
+          edge_alpha = ifelse(
+            .data[["set_alpha_edge"]] == 0.25 | # nolint
+              .data[["unsat_col"]] == "white", # nolint
+            0,
+            .data[["set_alpha_edge"]]
+          ),
+          edge_color = .data[["unsat_col"]]
+        ),
+        position = ggplot2::position_nudge(
+          x = 0.01,
+          y = -0.04
+        ),
+        edge_linetype = "solid",
+        edge_width = 1.25,
+        end_cap = ggraph::circle(5, "mm"),
+        lineend = "round",
+        arrow = grid::arrow(
+          length = ggplot2::unit(2, "mm"),
+          type = "closed"
+        ),
+        angle_calc = "along",
+        show.legend = FALSE
+      ) +
+      # general edge attributes
       ggraph::geom_edge_link(
         ggplot2::aes(
           label = ifelse(
@@ -1156,38 +1250,38 @@ ms_plot_lipidnet <- function( # nolint
           ),
           alpha = .data[["set_alpha_edge"]]
         ),
-        label_dodge = ggplot2::unit(2, "mm"),
-        label_alpha = 0.5,
+        edge_linetype = "solid",
+        label_dodge = ggplot2::unit(1.2, "mm"),
+        label_alpha = 0.6,
         angle_calc = "along",
         color = "grey50",
         show.legend = FALSE
       ) +
-
       # Background for node panels
       ggplot2::geom_rect(
         ggplot2::aes(
           xmin = ifelse(
             .data[["cluster_size"]] == 0,
             0,
-            x - 0.25 # nolint
+            x - 0.175 # nolint
           ),
           ymin = ifelse(
             .data[["cluster_size"]] == 0,
             0,
-            y - 0.25 # nolint
+            y - 0.175 # nolint
           ),
           ymax = ifelse(
             .data[["cluster_size"]] == 0,
             0,
-            y + 0.15
+            y + 0.175
           ),
           xmax = ifelse(
             .data[["cluster_size"]] == 0,
             0,
-            x + 0.25
+            x + 0.175
           )
         ),
-        alpha = 0.9,
+        alpha = 0.7,
         fill = "grey",
         color = "grey25",
         show.legend = FALSE
@@ -1207,52 +1301,49 @@ ms_plot_lipidnet <- function( # nolint
       ## Change scale
       ggnewscale::new_scale_color() +
       ggnewscale::new_scale_fill() +
-      ## Lipid Ratio edges START HERE 1/25/25 (Change to geom_edge_link)
-      # ChemRICH nodes
+      # Enrichment nodes
       ggraph::geom_node_point(
         ggplot2::aes(
           size = ifelse(
             is.na(.data[[paste(
-              "n", cmp, "Sat", sep = "_"
+              "Log2FC", cmp, sep = "_"
             )]]) |
               unlist(
                 lapply(
                   .data[[paste(
-                    "n", cmp, "Sat", sep = "_"
+                    "Log2FC", cmp, sep = "_"
                   )]],
                   function(x) is.null(x)
                 )
               ),
             0,
-            sqrt(as.numeric(unlist(.data[[paste(
-              "n", cmp, "Sat", sep = "_"
-            )]])))
+            1
           ),
           fill = ifelse(
             is.na(.data[[paste(
-              "Ratio", cmp, "Sat", sep = "_"
+              "Log2FC", cmp, sep = "_"
             )]]) |
               unlist(
                 lapply(
                   .data[[paste(
-                    "Ratio", cmp, "Sat", sep = "_"
+                    "Log2FC", cmp, sep = "_"
                   )]],
                   function(x) is.null(x)
                 )
               ),
             0.5,
             unlist(.data[[paste(
-              "Ratio", cmp, "Sat", sep = "_"
+              "Log2FC", cmp, sep = "_"
             )]])
           ),
           color = ifelse(
             is.na(.data[[paste(
-              "Ratio", cmp, "Sat", sep = "_"
+              "Log2FC", cmp, sep = "_"
             )]]) |
               unlist(
                 lapply(
                   .data[[paste(
-                    "Ratio", cmp, "Sat", sep = "_"
+                    "Log2FC", cmp, sep = "_"
                   )]],
                   function(x) is.null(x)
                 )
@@ -1260,69 +1351,6 @@ ms_plot_lipidnet <- function( # nolint
             "b",
             "a"
           )
-        ),
-        position = ggplot2::position_nudge(
-          x = -0.1,
-          y = -0.05
-        ),
-        shape = 21,
-        show.legend = FALSE
-      ) +
-      ggraph::geom_node_point(
-        ggplot2::aes(
-          size = ifelse(
-            is.na(.data[[paste(
-              "n", cmp, "Unsat", sep = "_"
-            )]]) |
-              unlist(
-                lapply(
-                  .data[[paste(
-                    "n", cmp, "Unsat", sep = "_"
-                  )]],
-                  function(x) is.null(x)
-                )
-              ),
-            0,
-            sqrt(as.numeric(unlist(.data[[paste(
-              "n", cmp, "Unsat", sep = "_"
-            )]])))
-          ),
-          fill = ifelse(
-            is.na(.data[[paste(
-              "Ratio", cmp, "Unsat", sep = "_"
-            )]]) |
-              unlist(
-                lapply(
-                  .data[[paste(
-                    "Ratio", cmp, "Unsat", sep = "_"
-                  )]],
-                  function(x) is.null(x)
-                )
-              ),
-            0.5,
-            unlist(.data[[paste(
-              "Ratio", cmp, "Unsat", sep = "_"
-            )]])
-          ),
-          color = ifelse(
-            is.na(.data[[paste(
-              "Ratio", cmp, "Unsat", sep = "_"
-            )]]) |
-              unlist(
-                lapply(
-                  .data[[paste(
-                    "Ratio", cmp, "Unsat", sep = "_"
-                  )]],
-                  function(x) is.null(x)
-                )
-              ),
-            "b",
-            "a"
-          )
-        ),
-        position = ggplot2::position_nudge(
-          x = 0.1,
-          y = -0.05
         ),
         shape = 21,
         show.legend = FALSE
@@ -1333,177 +1361,107 @@ ms_plot_lipidnet <- function( # nolint
       ) +
       ## Change scale
       ggnewscale::new_scale_color() +
-        
-        
-        
-        
-        # ChemRICH node labels
-        shadowtext::geom_shadowtext(
-          ggplot2::aes(
-            x = x,
-            y = y,
-            label = ifelse(
-              unlist(
-                lapply(
-                  .data[[paste("n", cmp, "Sat", sep = "_")]],
-                  function(x) is.null(x)
-                )
-              ),
-              "",
-              "Sat."
-            ),
-            size = ifelse(
-              .data[["cluster_size"]] == 0,
-              0,
-              0.2
-            )
-          ),
-          nudge_x = -0.1,
-          nudge_y = -0.15,
-          color = "white",
-          bg.color = "grey25",
-          show.legend = FALSE
-        ) +
-        shadowtext::geom_shadowtext(
-          ggplot2::aes(
-            x = x,
-            y = y,
-            label = ifelse(
-              unlist(
-                lapply(
-                  .data[[paste("n", cmp, "Unsat", sep = "_")]],
-                  function(x) is.null(x)
-                )
-              ),
-              "",
-              "Unsat."
-            ),
-            size = ifelse(
-              .data[["cluster_size"]] == 0,
-              0,
-              0.2
-            )
-          ),
-          nudge_x = 0.1,
-          nudge_y = -0.15,
-          color = "white",
-          bg.color = "grey25",
-          show.legend = FALSE
-        ) +
-        # ChemRICH node FDR labels
-        shadowtext::geom_shadowtext(
-          ggplot2::aes(
-            x = x,
-            y = y,
-            label = unlist(
+      # ChemRICH node labels
+      shadowtext::geom_shadowtext(
+        ggplot2::aes(
+          x = x,
+          y = y,
+          label = ifelse(
+            unlist(
               lapply(
-                .data[[paste("FDR", cmp, "Sat", sep = "_")]],
-                function(x) {
-                  d1 <- ifelse(
-                    !is.null(x),
-                    x > 0.05 | is.na(x),
-                    TRUE
-                  )
-                  d1 <- ifelse(
-                    d1 == FALSE,
-                    paste("FDR = ", round(x, digits = 4)),
-                    ""
-                  )
-                  return(d1)
-                }
+                .data[[paste("Log2FC", cmp, sep = "_")]],
+                function(x) is.null(x)
               )
             ),
-            size = ifelse(
-              .data[["cluster_size"]] == 0,
-              0,
-              0.2
-            )
+            "",
+            "Sat./Unsat."
           ),
-          nudge_x = -0.1,
-          nudge_y = -0.2,
-          color = "white",
-          bg.color = "grey10",
-          show.legend = FALSE
-        ) +
-        shadowtext::geom_shadowtext(
-          ggplot2::aes(
-            x = x,
-            y = y,
-            label = unlist(
-              lapply(
-                .data[[paste("FDR", cmp, "Unsat", sep = "_")]],
-                function(x) {
-                  d1 <- ifelse(
-                    !is.null(x),
-                    x > 0.05 | is.na(x),
-                    TRUE
-                  )
-                  d1 <- ifelse(
-                    d1 == FALSE,
-                    paste("FDR = ", round(x, digits = 4)),
-                    ""
-                  )
-                  return(d1)
-                }
-              )
-            ),
-            size = ifelse(
-              .data[["cluster_size"]] == 0,
-              0,
-              0.2
-            )
-          ),
-          nudge_x = 0.1,
-          nudge_y = -0.2,
-          color = "white",
-          bg.color = "grey10",
-          show.legend = FALSE
-        ) +
-        # Increased ratio color scale
-        ggplot2::scale_fill_gradientn(
-          "Increased Ratio",
-          colors = c(
-            "dodgerblue4",
-            "azure",
-            "firebrick3"
+          size = ifelse(
+            .data[["cluster_size"]] == 0,
+            0,
+            0.05
           )
-        ) +
-        ## Change scale
-        ggnewscale::new_scale_color() +
-        ggplot2::scale_size_area(
-          max_size = 16
-        ) +
-        # text labels
-        ggrepel::geom_text_repel(
-          ggplot2::aes(
-            x = .data[["x"]],
-            y = .data[["y"]],
-            label = .data[["label"]],
-            alpha = ifelse(
-              .data[["cluster_size"]] == 0,
-              0.1,
-              1
-            ),
-            size = ifelse(
-              .data[["cluster_size"]] == 0,
-              0.05,
-              0.25
+        ),
+        nudge_y = -0.075,
+        color = "white",
+        bg.color = "grey25",
+        show.legend = FALSE
+      ) +
+      # ChemRICH node FDR labels
+      shadowtext::geom_shadowtext(
+        ggplot2::aes(
+          x = x,
+          y = y,
+          label = unlist(
+            lapply(
+              .data[[paste("FDR", cmp, sep = "_")]],
+              function(x) {
+                d1 <- ifelse(
+                  !is.null(x),
+                  x > 0.05 | is.na(x),
+                  TRUE
+                )
+                d1 <- ifelse(
+                  d1 == FALSE,
+                  paste("FDR = ", round(x, digits = 4)),
+                  ""
+                )
+                return(d1)
+              }
             )
           ),
-          color = "black",
-          bg.r = 0.01,
-          bg.color = "white",
-          nudge_x = 0,
-          nudge_y = 0.1 * 1,
-          show.legend = FALSE
-        ) +
-        ggplot2::scale_color_manual(
-          "Pathway",
-          values = col_univ()
-        ) +
-        # plot theme
-        ms_theme1() + # nolint
-        ms_theme_net() # nolint
+          size = ifelse(
+            .data[["cluster_size"]] == 0,
+            0,
+            0.05
+          )
+        ),
+        nudge_y = -0.125,
+        color = "white",
+        bg.color = "grey10",
+        show.legend = FALSE
+      ) +
+      # Increased ratio color scale
+      ggplot2::scale_fill_gradientn(
+        "Log2FC",
+        colors = c(
+          "dodgerblue4",
+          "azure",
+          "firebrick3"
+        )
+      ) +
+      ## Change scale
+      ggnewscale::new_scale_color() +
+      ggplot2::scale_size_area(
+        max_size = 16
+      ) +
+      # text labels
+      ggrepel::geom_text_repel(
+        ggplot2::aes(
+          x = .data[["x"]],
+          y = .data[["y"]],
+          label = .data[["label"]],
+          alpha = ifelse(
+            .data[["cluster_size"]] == 0,
+            0.1,
+            1
+          ),
+          size = ifelse(
+            .data[["cluster_size"]] == 0,
+            0.02,
+            0.05
+          )
+        ),
+        color = "black",
+        bg.r = 0.01,
+        bg.color = "white",
+        nudge_x = 0,
+        nudge_y = 0.09 * 1,
+        show.legend = FALSE
+      ) +
+      # plot theme
+      ms_theme1() + # nolint
+      ms_theme_net() # nolint
   }
   return(net_plot2)
 }
