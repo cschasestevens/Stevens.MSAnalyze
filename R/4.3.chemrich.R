@@ -225,8 +225,7 @@ ms_stat_crich <- function(
 #' and statistical significance.
 #' @examples
 #' # ms_plot_crich(
-#' #   dfcr = d[["chemrich"]][d[["chemrich"]][["Comparison"]] == "comp1", ],
-#' #   p_title = "comp1"
+#' #   dfcr = d[["chemrich"]][d[["chemrich"]][["Comparison"]] == "comp1", ]
 #' # )
 #'
 #' @export

@@ -9,6 +9,8 @@
 #' @param sc_d Transform and scale data?
 #' @param sc_meth Data scaling method (performed after log2 transformation);
 #' Currently available methods are "Median" or "Pareto" (default).
+#' @param hm_w Correlation heatmap width.
+#' @param hm_h Correlation heatmap height.
 #' @return List containing formatted input data and metadata
 #' for downstream analysis.
 #' @examples
@@ -21,7 +23,9 @@ ms_data_check <- function(
   cl_var,
   samp_id,
   sc_d = TRUE,
-  sc_meth = "Pareto"
+  sc_meth = "Pareto",
+  hm_w = 20,
+  hm_h = 20
 ) {
   # input data from ms_input()
   ld1 <- ld
@@ -177,8 +181,8 @@ ms_data_check <- function(
     show_row_names = TRUE,
     cluster_columns = TRUE,
     cluster_rows = TRUE,
-    heatmap_width = ggplot2::unit(16, "cm"),
-    heatmap_height = ggplot2::unit(16, "cm"),
+    heatmap_width = ggplot2::unit(hm_w, "cm"),
+    heatmap_height = ggplot2::unit(hm_h, "cm"),
     column_title = "Sample Correlation"
   )
   if(sc_d == FALSE) { # nolint
