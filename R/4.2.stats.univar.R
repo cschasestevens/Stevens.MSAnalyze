@@ -542,15 +542,9 @@ ms_stat_anova <- function( # nolint
       # Load data
       d1 <- matpv
       md1 <- md
-      if(is.null(an)) { # nolint
-        an1 <- data.frame("Name" = names(d1))
-      }
-      if(!is.null(an)) { # nolint
-        an1 <- an
-      }
       d1 <- aggregate(
         t(as.matrix(d1)),
-        list(an1[[grp_class1]]),
+        list(an[[grp_class1]]),
         function(x) mean(x)
       )
       d1 <- setNames(as.data.frame(t(d1[, 2:ncol(d1)])), d1[[1]])
@@ -585,6 +579,7 @@ ms_stat_anova <- function( # nolint
         }
       ), paste(rat1[["class1"]], rat1[["class2"]], sep = "_"))
       d1 <- dplyr::bind_cols(rat2[lengths(rat2) > 1])
+      an1 <- data.frame("Name" = names(d1))
       # Check for normality
       d1_check <- as.data.frame(
         apply(
@@ -770,7 +765,7 @@ ms_stat_anova <- function( # nolint
           mat_type = "norm",
           md = md1,
           md_var = md_var,
-          an = an1,
+          an = an,
           lipid_fc = lipid_fc1,
           grp_class = grp_class1
         )
@@ -781,7 +776,7 @@ ms_stat_anova <- function( # nolint
           mat_type = "scaled",
           md = md1,
           md_var = md_var,
-          an = an1,
+          an = an,
           lipid_fc = lipid_fc1,
           grp_class = grp_class1
         )
@@ -817,6 +812,7 @@ ms_stat_anova <- function( # nolint
         fold_all,
         by = c("Comparison.fc", "Name")
       )
+      head(d_out)
     }
   }
   if(Sys.info()[["sysname"]] == "Windows") { # nolint
@@ -1311,15 +1307,9 @@ ms_stat_anova <- function( # nolint
       # Load data
       d1 <- matpv
       md1 <- md
-      if(is.null(an)) { # nolint
-        an1 <- data.frame("Name" = names(d1))
-      }
-      if(!is.null(an)) { # nolint
-        an1 <- an
-      }
       d1 <- aggregate(
         t(as.matrix(d1)),
-        list(an1[[grp_class1]]),
+        list(an[[grp_class1]]),
         function(x) mean(x)
       )
       d1 <- setNames(as.data.frame(t(d1[, 2:ncol(d1)])), d1[[1]])
@@ -1354,6 +1344,7 @@ ms_stat_anova <- function( # nolint
         }
       ), paste(rat1[["class1"]], rat1[["class2"]], sep = "_"))
       d1 <- dplyr::bind_cols(rat2[lengths(rat2) > 1])
+      an1 <- data.frame("Name" = names(d1))
       # Check for normality
       d1_check <- as.data.frame(
         apply(
@@ -1536,7 +1527,7 @@ ms_stat_anova <- function( # nolint
           mat_type = "norm",
           md = md1,
           md_var = md_var,
-          an = an1,
+          an = an,
           lipid_fc = lipid_fc1,
           grp_class = grp_class1
         )
@@ -1547,7 +1538,7 @@ ms_stat_anova <- function( # nolint
           mat_type = "scaled",
           md = md1,
           md_var = md_var,
-          an = an1,
+          an = an,
           lipid_fc = lipid_fc1,
           grp_class = grp_class1
         )
