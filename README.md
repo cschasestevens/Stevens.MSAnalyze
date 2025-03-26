@@ -1,4 +1,4 @@
-# Stevens.MSAnalyze v1.1
+# Stevens.MSAnalyze v1.2
 
 Processing and Analysis of Metabolomics Datasets
 
@@ -79,6 +79,10 @@ browseVignettes("Stevens.MSAnalyze")
 * LinkedIn: https://www.linkedin.com/in/nathanial-chase-stevens-phd-08775180/
 
 ## Version History
+* 1.2
+    * Added functions for scatter plots
+    * Revised data upload function
+    * Various bug fixes for fold change and univariate statistics functions
 * 1.1
     * Added compatibility for plotting enrichment results onto a network diagram (lipidomics only)
     * Added functions for regression and correlation analysis

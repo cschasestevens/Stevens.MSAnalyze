@@ -2108,3 +2108,136 @@ ms_plot_lipidnet <- function( # nolint
   }
   return(net_plot2)
 }
+
+#' Scatter Plot
+#'
+#' Generates a scatter plot from a statistical results object for
+#' a chosen comparison.
+#'
+#' @param df1 Input data frame.
+#' @param type1 Scatter plot type (either "std" or "oxview").
+#' If type is "oxview," a variable indicating either "Oxidized"
+#' or "Unoxidized" lipids must be present in the input data frame.
+#' @param xvar X-axis variable.
+#' @param yvar Y-axis variable.
+#' @param clvar Group variable.
+#' @param oxvar (optional) If type is "oxview," the variable name
+#' distinguishing oxidized from unoxidized lipids.
+#' @param bns (optional) Bin number for scatter plot types using
+#' stat_density_2d().
+#' @return A scatter plot for the chosen treatment comparisons.
+#' @examples
+#'
+#' # ms_plot_scatter(
+#' #   df1 = dox,
+#' #   type1 = "oxview",
+#' #   xvar = "rt",
+#' #   yvar = "mz",
+#' #   clvar = "class"
+#' # )
+#'
+#' @export
+ms_plot_scatter <- function(
+  df1,
+  type1,
+  xvar,
+  yvar,
+  clvar,
+  oxvar = "ox",
+  bns = 50
+) {
+  d <- df1
+  if(type1 == "oxview") { # nolint
+    ggplot2::ggplot(
+      d,
+      ggplot2::aes(
+        x = .data[[xvar]], # nolint
+        y = .data[[yvar]],
+        color = .data[[clvar]],
+        label = .data[[clvar]]
+      )
+    ) +
+      ggplot2::scale_fill_manual(
+        name = "Type",
+        values = rep(
+          col_univ()[[2]],
+          length(unique(d[d[[oxvar]] == "Unoxidized", ][[clvar]]))
+        )
+      ) +
+      ggplot2::stat_density_2d(
+        data = d[d[[oxvar]] == "Unoxidized", ],
+        ggplot2::aes(
+          fill = d[d[[oxvar]] == "Unoxidized", ][[clvar]]
+        ),
+        geom = "polygon",
+        alpha = 0.1,
+        linewidth = 0.01,
+        bins = bns,
+        contour = TRUE,
+        show.legend = FALSE
+      ) +
+      ggnewscale::new_scale_fill() +
+      ggplot2::scale_fill_manual(
+        name = "Type",
+        values = rep(
+          col_univ()[[1]],
+          length(unique(d[d[[oxvar]] == "Oxidized", ][[clvar]]))
+        )
+      ) +
+      ggplot2::stat_density_2d(
+        data = d[d[[oxvar]] == "Oxidized", ],
+        ggplot2::aes(
+          fill = d[d[[oxvar]] == "Oxidized", ][[clvar]]
+        ),
+        geom = "polygon",
+        alpha = 0.4,
+        linewidth = 0.01,
+        bins = bns,
+        contour = TRUE,
+        show.legend = FALSE
+      ) +
+      ggnewscale::new_scale_fill() +
+      ggplot2::scale_color_manual(
+        name = "Class",
+        values = col_univ()
+      ) +
+      ggplot2::geom_point(
+        shape = 16,
+        size = 1,
+        alpha = 0.6
+      ) +
+      ggrepel::geom_text_repel(
+        data = setNames(
+          aggregate(
+            d[, c(yvar, xvar)],
+            list(d[[clvar]]),
+            FUN = median
+          ),
+          c(clvar, yvar, xvar
+          )
+        ),
+        size = 3,
+        bg.color = "grey0",
+        color = "white",
+        bg.r = 0.05
+      ) +
+      # Add Theme
+      ms_theme1() + # nolint
+      ggplot2::labs(
+        y = "m/z",
+        x = "RT (min.)",
+        color = "Class"
+      ) +
+      ggplot2::theme(
+        plot.margin = ggplot2::unit(
+          c(
+            0.1,
+            0.1,
+            0.1,
+            0.1
+          ),
+          "cm"
+        )
+      )
+  }
+}
